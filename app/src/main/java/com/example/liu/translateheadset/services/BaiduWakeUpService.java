@@ -68,4 +68,10 @@ public class BaiduWakeUpService extends Service implements EventListener {
         json = new JSONObject(params).toString();
         wakeUp.send(SpeechConstant.WAKEUP_START, json, null, 0, 0);
     }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        wakeUp.send(SpeechConstant.WAKEUP_STOP, "{}", null, 0, 0);
+    }
 }

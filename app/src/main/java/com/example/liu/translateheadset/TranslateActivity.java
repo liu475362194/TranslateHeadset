@@ -33,9 +33,11 @@ import com.example.liu.translateheadset.gson.WakeUp;
 import com.example.liu.translateheadset.services.BaiDuSpeekService;
 import com.example.liu.translateheadset.services.BaiDuTTSService;
 import com.example.liu.translateheadset.services.BaiduWakeUpService;
+import com.example.liu.translateheadset.util.TimeStart2Stop;
 import com.google.gson.Gson;
 
 import java.io.IOException;
+import java.sql.Time;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -60,7 +62,7 @@ public class TranslateActivity extends AppCompatActivity {
     private TalkAdapter adapter;
     private Gson gson;
     private TransApi transApi;
-    private Intent intentTts,intentSpeek,intentWakeUp;
+    private Intent intentTts, intentSpeek, intentWakeUp;
     private BaiDuSpeekService.SpeekResultListener speekResultListener = new BaiDuSpeekService.SpeekResultListener() {
         @Override
         public void startSpeek(int who) {
@@ -200,64 +202,79 @@ public class TranslateActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_translate);
-
+        long last = TimeStart2Stop.timeNeed(this,"onCreate",-1);
         initView();
         initPermission();
 
-
+        TimeStart2Stop.timeNeed(this,"onCreate",last);
     }
 
     /**
      * 启动服务
      */
     private void initService() {
+        long last = TimeStart2Stop.timeNeed(this,"initService",-1);
         intentTts = new Intent(TranslateActivity.this, BaiDuTTSService.class);
         startService(intentTts);
         intentSpeek = new Intent(this, BaiDuSpeekService.class);
         startService(intentSpeek);
         intentWakeUp = new Intent(this, BaiduWakeUpService.class);
         startService(intentWakeUp);
+        TimeStart2Stop.timeNeed(this,"initService",last);
     }
 
     /**
      * 初始化Binder服务
      */
     private void initBinder() {
-        Intent intentTts = new Intent(this, BaiDuTTSService.class);
+        long last = TimeStart2Stop.timeNeed(this,"initBinder",-1);
+
+//        Intent intentTts = new Intent(this, BaiDuTTSService.class);
         bindService(intentTts, connectionTts, BIND_AUTO_CREATE);
 //        BaiDuSpeekService baiDuSpeekService = new BaiDuSpeekService(this);
 
-        Intent intentSpeek = new Intent(this, BaiDuSpeekService.class);
+//        Intent intentSpeek = new Intent(this, BaiDuSpeekService.class);
         bindService(intentSpeek, connectionSpeek, BIND_AUTO_CREATE);
 //        speekBinder.init(this);
 
-        Intent intentWakeUp = new Intent(this, BaiduWakeUpService.class);
+//        Intent intentWakeUp = new Intent(this, BaiduWakeUpService.class);
         bindService(intentWakeUp, connectionWakeUp, BIND_AUTO_CREATE);
+
+        TimeStart2Stop.timeNeed(this,"initBinder",last);
     }
 
     /**
      * 关闭服务
      */
     private void closeService() {
+        long last = TimeStart2Stop.timeNeed(this,"closeService",-1);
 
-        if (connectionTts != null)
+        if (connectionTts != null) {
             unbindService(connectionTts);
-        if (connectionSpeek != null)
+            connectionTts = null;
+        }
+        if (connectionSpeek != null) {
             unbindService(connectionSpeek);
-        if (connectionWakeUp != null)
+            connectionSpeek = null;
+        }
+        if (connectionWakeUp != null) {
             unbindService(connectionWakeUp);
+            connectionWakeUp = null;
+        }
         if (intentSpeek != null)
             stopService(intentSpeek);
         if (intentTts != null)
             stopService(intentTts);
         if (intentWakeUp != null)
             stopService(intentWakeUp);
+        TimeStart2Stop.timeNeed(this,"closeService",last);
     }
 
     /**
      * 初始化界面
      */
     private void initView() {
+        long last = TimeStart2Stop.timeNeed(this,"initView",-1);
         editText = findViewById(R.id.edit_text);
         startTransZh = findViewById(R.id.start_trans_zh);
         startTransEn = findViewById(R.id.start_trans_en);
@@ -265,7 +282,7 @@ public class TranslateActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.recycler);
         adapter = new TalkAdapter(talkAlls);
         send = findViewById(R.id.send);
-
+        initClickListener();
         adapter.setmItemClickListener(new TalkAdapter.ItemClickListener() {
             @Override
             public void onClick(int position) {
@@ -279,6 +296,7 @@ public class TranslateActivity extends AppCompatActivity {
         recyclerView.setAdapter(adapter);
         transApi = new TransApi(APP_ID, SECURITY_KEY);
         gson = new Gson();
+        TimeStart2Stop.timeNeed(this,"initView",last);
     }
 
 
@@ -390,6 +408,7 @@ public class TranslateActivity extends AppCompatActivity {
      * android 6.0 以上需要动态申请权限
      */
     private void initPermission() {
+        long last = TimeStart2Stop.timeNeed(this,"initPermission",-1);
         String permissions[] = {
                 Manifest.permission.RECORD_AUDIO,
                 Manifest.permission.INTERNET,
@@ -414,10 +433,10 @@ public class TranslateActivity extends AppCompatActivity {
         if (!toApplyList.isEmpty()) {
             ActivityCompat.requestPermissions(this, toApplyList.toArray(tmpList), 123);
         } else {
-            initSpeek();
             initService();
             initBinder();
         }
+        TimeStart2Stop.timeNeed(this,"initPermission",last);
     }
 
     /**
@@ -431,14 +450,15 @@ public class TranslateActivity extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         // 此处为android 6.0以上动态授权的回调，用户自行实现。
         if (requestCode == 123) {
+            long last = TimeStart2Stop.timeNeed(TranslateActivity.this,"onRequestPermissionsResult",-1);
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                initSpeek();
                 initService();
                 initBinder();
             } else {
                 Toast.makeText(TranslateActivity.this, "未获取到权限，请重新打开！", Toast.LENGTH_SHORT).show();
                 finish();
             }
+            TimeStart2Stop.timeNeed(TranslateActivity.this,"onRequestPermissionsResult",last);
         }
     }
 
@@ -448,7 +468,7 @@ public class TranslateActivity extends AppCompatActivity {
         closeService();
     }
 
-    private void initSpeek() {
+    private void initClickListener() {
         startTransZh.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

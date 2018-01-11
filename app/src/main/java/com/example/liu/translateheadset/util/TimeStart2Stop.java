@@ -12,7 +12,7 @@ public class TimeStart2Stop {
 
     //求时间戳
     public static long timeNeed(Context context, String address, long lastTime) {
-        boolean isRun = false;
+        boolean isRun = true;
         if (isRun) {
             if (lastTime == -1) {
                 Log.d(TAG, context.getClass().getSimpleName() + "--" + address + " 计时开始...");

@@ -65,7 +65,7 @@ public class ChatActivity extends BaseActivity {
     private Button btn_speak;
     private EditText et_content;
     private List<EMMessage> msgList;
-    private List<Message> messages;
+    private List<Message> messagesWithTranslate;
     MessageAdapter adapter;
     private EMConversation conversation;
     protected int pagesize = 20;
@@ -161,6 +161,9 @@ public class ChatActivity extends BaseActivity {
         TimeStart2Stop.timeNeed(ChatActivity.this, "onCreate", last);
     }
 
+    /**
+     * 收到指令广播的广播接收器
+     */
     class NotifyReceiver extends BroadcastReceiver {
 
         @Override
@@ -171,16 +174,20 @@ public class ChatActivity extends BaseActivity {
         }
     }
 
+    /**
+     * 初始化list
+     *
+     */
     private void initList() {
         long last = TimeStart2Stop.timeNeed(ChatActivity.this, "initList", -1);
         msgList = conversation.getAllMessages();
-        messages = new ArrayList<>();
+        messagesWithTranslate = new ArrayList<>();
 
         for (EMMessage message : msgList) {
             addMes(message);
         }
         translateMes(false);
-        adapter = new MessageAdapter(messages, ChatActivity.this);
+        adapter = new MessageAdapter(messagesWithTranslate, ChatActivity.this);
         listView.setAdapter(adapter);
         listView.setSelection(listView.getCount() - 1);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -194,12 +201,16 @@ public class ChatActivity extends BaseActivity {
         TimeStart2Stop.timeNeed(ChatActivity.this, "initList", last);
     }
 
+    /**
+     * 翻译所有未翻译的消息
+     * @param isNow
+     */
     private void translateMes(final boolean isNow) {
         final TranslateHelper helper = new TranslateHelper();
-        for (int i = 0; i < messages.size(); i++) {
-            final Message message = messages.get(i);
+        for (int i = 0; i < messagesWithTranslate.size(); i++) {
+            final Message message = messagesWithTranslate.get(i);
             final int finalI = i;
-            if (null != messages.get(i).getTranslate()) {
+            if (null != messagesWithTranslate.get(i).getTranslate()) {
                 continue;
             }
             helper.startTranslate(message.getMessage(), new Callback() {
@@ -212,14 +223,14 @@ public class ChatActivity extends BaseActivity {
                 public void onResponse(Call call, Response response) throws IOException {
                     String text = helper.responseTrans(response);
                     message.setTranslate(text);
-                    messages.set(finalI, message);
+                    messagesWithTranslate.set(finalI, message);
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
                             adapter.notifyDataSetChanged();
                         }
                     });
-                    Log.d(TAG, "onResponse: " + messages.get(finalI).getType());
+                    Log.d(TAG, "onResponse: " + messagesWithTranslate.get(finalI).getType());
                     if (isNow) {
                         getTtsBinder.speak(text);
                         Log.d(TAG, "onResponse: start speak " + helper.responseTrans(response));
@@ -230,6 +241,10 @@ public class ChatActivity extends BaseActivity {
         }
     }
 
+    /**
+     * 往消息list中添加一条新信息
+     * @param message
+     */
     private void addMes(EMMessage message) {
         Message mMessage = new Message();
         String text = ((EMTextMessageBody) message.getBody()).getMessage();
@@ -239,7 +254,7 @@ public class ChatActivity extends BaseActivity {
         } else {
             mMessage.setType(1);
         }
-        messages.add(mMessage);
+        messagesWithTranslate.add(mMessage);
     }
 
     /**
@@ -274,6 +289,9 @@ public class ChatActivity extends BaseActivity {
         TimeStart2Stop.timeNeed(ChatActivity.this, "initBinder", last);
     }
 
+    /**
+     * 获取全部聊天记录
+     */
     protected void getAllMessage() {
         long last = TimeStart2Stop.timeNeed(ChatActivity.this, "getAllMessage", -1);
         // 获取当前conversation对象
@@ -297,6 +315,10 @@ public class ChatActivity extends BaseActivity {
 
     }
 
+    /**
+     * 发送一条信息
+     * @param content 聊天信息内容
+     */
     private void setMesaage(String content) {
         long last = TimeStart2Stop.timeNeed(ChatActivity.this, "setMessage", -1);
 
@@ -319,6 +341,9 @@ public class ChatActivity extends BaseActivity {
         TimeStart2Stop.timeNeed(ChatActivity.this, "setMessage", last);
     }
 
+    /**
+     * 信息收发监听
+     */
     EMMessageListener msgListener = new EMMessageListener() {
 
         @Override
@@ -418,6 +443,10 @@ public class ChatActivity extends BaseActivity {
 //        recorder.start();
 //        alexaManager.sendAudioRequest(requestBody, getRequestCallback());
 //    }
+
+    /**
+     * 关闭SCO端口
+     */
     private void stopSCO() {
         if (mAudioManager.isBluetoothScoOn()) {
 //            mAudioManager.setMode(AudioManager.MODE_NORMAL);
@@ -428,7 +457,9 @@ public class ChatActivity extends BaseActivity {
         Log.e(TAG, "stopSCO: startListening: recorder.stop()");
     }
 
-    // 二、录音
+    /**
+     * 打开SCO端口，使用耳机端录音
+     */
     public void startRecording() {
         long last = TimeStart2Stop.timeNeed(ChatActivity.this, "startRecording", -1);
         mAudioManager.setMode(AudioManager.MODE_IN_CALL);
@@ -537,8 +568,8 @@ public class ChatActivity extends BaseActivity {
             }
 
 //            EMTextMessageBody txtBody = (EMTextMessageBody) message.getBody();
-            holder.tv.setText(messages.get(position).getMessage());
-            holder.tvTranslate.setText(messages.get(position).getTranslate());
+            holder.tv.setText(messagesWithTranslate.get(position).getMessage());
+            holder.tvTranslate.setText(messagesWithTranslate.get(position).getTranslate());
 
             return convertView;
         }
@@ -552,6 +583,9 @@ public class ChatActivity extends BaseActivity {
 
     }
 
+    /**
+     * 百度语音识别处理监听
+     */
     private BaiDuSpeekService.SpeekResultListener speekResultListener = new BaiDuSpeekService.SpeekResultListener() {
         @Override
         public void startSpeek(int who) {
@@ -624,6 +658,11 @@ public class ChatActivity extends BaseActivity {
         }
     };
 
+    /**
+     * 语音识别结果处理
+     * @param string
+     * @throws IOException
+     */
     private void responseSpeak(String string) throws IOException {
         Log.d(TAG, "respinseSpeek: " + string);
         Speak speak = gson.fromJson(string, Speak.class);

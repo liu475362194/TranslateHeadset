@@ -63,7 +63,7 @@ public class SplashActivity extends BaseActivity {
             if (PackageManager.PERMISSION_GRANTED != ContextCompat.checkSelfPermission(this, perm)) {
                 toApplyList.add(perm);
                 //进入到这里代表没有权限.
-                Toast.makeText(SplashActivity.this, "未获取到权限，请重新打开！", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(SplashActivity.this, "未获取到权限，请重新打开！", Toast.LENGTH_SHORT).show();
 //                finish();
             }
         }
@@ -86,9 +86,10 @@ public class SplashActivity extends BaseActivity {
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         // 此处为android 6.0以上动态授权的回调，用户自行实现。
         if (requestCode == 123) {
-//            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-//                autoLogin();
-//            } else {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                autoLogin();
+            }
+// else {
 //
 //            }
         }
