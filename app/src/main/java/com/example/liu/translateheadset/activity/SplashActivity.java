@@ -100,8 +100,6 @@ public class SplashActivity extends BaseActivity {
     protected void onStart() {
         super.onStart();
         initPermission();
-
-
     }
 
     private void autoLogin() {

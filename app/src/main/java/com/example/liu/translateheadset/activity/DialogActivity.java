@@ -1,26 +1,44 @@
 package com.example.liu.translateheadset.activity;
 
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
 
 import com.example.liu.translateheadset.R;
 
-public class DialogActivity extends BaseActivity implements View.OnClickListener{
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
+public class DialogActivity extends BaseActivity implements View.OnClickListener {
+
+    @BindView(R.id.tv_content)
+    TextView tvContent;
+    @BindView(R.id.bt_relogin)
+    Button btRelogin;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dialog);
-        findViewById(R.id.bt_relogin).setOnClickListener(this);
+        ButterKnife.bind(this);
+        btRelogin.setOnClickListener(this);
+        Intent intent = getIntent();
+        String str = intent.getStringExtra("error_str");
+        if (null != str){
+            tvContent.setText(str);
+        } else {
+            tvContent.setText("出现异常，请重新登录。");
+        }
+
     }
 
     @Override
     public void onClick(View view) {
-        if (view.getId() == R.id.bt_relogin){
+        if (view.getId() == R.id.bt_relogin) {
             ActivityCollector.removeAllActivity();
-            startActivity(new Intent(DialogActivity.this,LoginActivity.class));
+            startActivity(new Intent(DialogActivity.this, LoginActivity.class));
         }
     }
 }

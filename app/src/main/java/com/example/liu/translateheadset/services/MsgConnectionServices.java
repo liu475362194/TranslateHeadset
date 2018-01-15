@@ -52,6 +52,10 @@ public class MsgConnectionServices extends Service {
                     if (error == EMError.USER_REMOVED) {
                         // 显示帐号已经被移除
                         Log.d(TAG, "run: 显示帐号已经被移除");
+                        Intent intent = new Intent(getApplicationContext(), DialogActivity.class);
+                        intent.putExtra("error_str","帐号已经被移除");
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(intent);
                     } else if (error == EMError.USER_LOGIN_ANOTHER_DEVICE) {
                         // 显示帐号在其他设备登录
                         Log.d(TAG, "run: 显示帐号在其他设备登录");
@@ -74,6 +78,7 @@ public class MsgConnectionServices extends Service {
                             @Override
                             public void onSuccess() {
                                 Intent intent = new Intent(getApplicationContext(), DialogActivity.class);
+                                intent.putExtra("error_str","帐号在其他设备登录");
                                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                                 startActivity(intent);
                             }

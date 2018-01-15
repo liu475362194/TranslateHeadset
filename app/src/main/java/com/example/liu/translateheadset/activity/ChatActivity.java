@@ -372,12 +372,17 @@ public class ChatActivity extends BaseActivity {
                     });
 
                     if (msgList.size() > 0) {
+                        // 获取当前conversation对象
+                        conversation = EMClient.getInstance().chatManager().getConversation(toChatUsername,
+                                EaseCommonUtils.getConversationType(chatType), true);
+                        // 把此会话的未读数置为0
+                        conversation.markAllMessagesAsRead();
                         et_content.setSelection(listView.getCount() - 1);
-                    }
 
+                    }
                 }
             }
-            conversation.markAllMessagesAsRead();
+
 
             TimeStart2Stop.timeNeed(ChatActivity.this, "onMessageReceived", last);
             // 收到消息
