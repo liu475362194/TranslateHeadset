@@ -35,6 +35,11 @@ public class DialogActivity extends BaseActivity implements View.OnClickListener
     }
 
     @Override
+    public void onBackPressed() {
+        return;
+    }
+
+    @Override
     public void onClick(View view) {
         if (view.getId() == R.id.bt_relogin) {
             ActivityCollector.removeAllActivity();

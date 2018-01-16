@@ -54,7 +54,11 @@ public class DbOpenHelper extends SQLiteOpenHelper{
             + UserDao.PREF_TABLE_NAME + " ("
             + UserDao.COLUMN_NAME_DISABLED_GROUPS + " TEXT, "
             + UserDao.COLUMN_NAME_DISABLED_IDS + " TEXT);";
-	
+
+	/**
+	 * 创建数据库,数据库名称为用户名+_demo.db
+	 * @param context
+	 */
 	private DbOpenHelper(Context context) {
 		super(context, getUserDatabaseName(), null, DATABASE_VERSION);
 	}
@@ -65,11 +69,19 @@ public class DbOpenHelper extends SQLiteOpenHelper{
 		}
 		return instance;
 	}
-	
+
+	/**
+	 * 返回数据库名称
+	 * @return
+	 */
 	private static String getUserDatabaseName() {
         return  DemoApplication.getInstance().getCurrentUserName() + "_demo.db";
     }
-	
+
+	/**
+	 * 建表
+	 * @param db
+	 */
 	@Override
 	public void onCreate(SQLiteDatabase db) {
 		db.execSQL(USERNAME_TABLE_CREATE);

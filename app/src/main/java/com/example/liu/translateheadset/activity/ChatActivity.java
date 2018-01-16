@@ -678,7 +678,7 @@ public class ChatActivity extends BaseActivity {
         } else if (speak.getResult_type().equals("final_result")) {
             stopSCO();
             result = speak.getResults_recognition().get(0);
-//            btn_send.setText("发送");
+//            btn_send.setTranslateText("发送");
             et_content.setText(result);
             setMesaage(result);
             btn_speak.setText(String.valueOf("识别"));

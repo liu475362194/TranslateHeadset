@@ -20,7 +20,7 @@
         android:layout_alignParentTop="true"
         android:layout_margin="10dp"
         android:layout_toRightOf="@id/iv_avatar"
-        android:text="昵称"
+        android:translateText="昵称"
         android:textColor="#000"
         android:textSize="16sp" />
 
@@ -31,7 +31,7 @@
         android:layout_alignParentBottom="true"
         android:layout_margin="10dp"
         android:layout_toRightOf="@id/iv_avatar"
-        android:text="加为好友"
+        android:translateText="加为好友"
         android:textColor="#999999"
         android:textSize="14sp" />
 
@@ -42,7 +42,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
-        android:text="同意"
+        android:translateText="同意"
         android:textColor="#999999"
         android:textSize="14sp" />
 

@@ -10,8 +10,6 @@ import android.widget.TextView;
 import com.example.liu.translateheadset.R;
 import com.example.liu.translateheadset.gson.TalkAll;
 
-import org.w3c.dom.Text;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,9 +41,9 @@ public class TalkAdapter extends RecyclerView.Adapter<TalkAdapter.ViewHolder> {
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view;
         if (viewType == 0){
-            view = View.inflate(parent.getContext(),R.layout.item_left,null);
+            view = View.inflate(parent.getContext(),R.layout.item_message_received,null);
         } else {
-            view = View.inflate(parent.getContext(),R.layout.item_right,null);
+            view = View.inflate(parent.getContext(),R.layout.item_message_sent,null);
         }
         return new ViewHolder(view);
     }
@@ -58,8 +56,8 @@ public class TalkAdapter extends RecyclerView.Adapter<TalkAdapter.ViewHolder> {
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
 //        if (talkAlls.get(position).getWho() == 0){
-            holder.textShow.setText(talkAlls.get(position).getText());
-            holder.yuanBen.setText(talkAlls.get(position).getYuanWen());
+            holder.translateText.setText(talkAlls.get(position).getTranslateText());
+            holder.yuanWen.setText(talkAlls.get(position).getYuanWen());
             holder.layout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -68,7 +66,7 @@ public class TalkAdapter extends RecyclerView.Adapter<TalkAdapter.ViewHolder> {
                 }
             });
 //        } else {
-//            holder.right.setText(talkAlls.get(position).getText());
+//            holder.right.setTranslateText(talkAlls.get(position).getTranslateText());
 //        }
     }
 
@@ -79,7 +77,7 @@ public class TalkAdapter extends RecyclerView.Adapter<TalkAdapter.ViewHolder> {
         } else {
             String payload = (String) payloads.get(0);
             Log.d(TAG, "onBindViewHolder:payload " + payload);
-            holder.yuanBen.setText(talkAlls.get(position).getYuanWen());
+            holder.yuanWen.setText(talkAlls.get(position).getYuanWen());
         }
     }
 
@@ -90,15 +88,15 @@ public class TalkAdapter extends RecyclerView.Adapter<TalkAdapter.ViewHolder> {
 
     class ViewHolder extends RecyclerView.ViewHolder{
 
-        private TextView textShow;
-        private TextView yuanBen;
+        private TextView translateText;
+        private TextView yuanWen;
         private LinearLayout layout;
 
         public ViewHolder(View itemView) {
             super(itemView);
             layout = itemView.findViewById(R.id.layout);
-            textShow = itemView.findViewById(R.id.text_show);
-            yuanBen = itemView.findViewById(R.id.yuan_wen);
+            translateText = itemView.findViewById(R.id.tv_chatcontent_translate);
+            yuanWen = itemView.findViewById(R.id.tv_chatcontent);
         }
 
     }

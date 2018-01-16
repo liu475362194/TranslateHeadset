@@ -37,7 +37,6 @@ import com.example.liu.translateheadset.util.TimeStart2Stop;
 import com.google.gson.Gson;
 
 import java.io.IOException;
-import java.sql.Time;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -288,7 +287,7 @@ public class TranslateActivity extends AppCompatActivity {
             public void onClick(int position) {
                 InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                 imm.hideSoftInputFromWindow(editText.getWindowToken(), 0);
-                getTtsBinder.speak(talkAlls.get(position).getText());
+                getTtsBinder.speak(talkAlls.get(position).getTranslateText());
             }
         });
         LinearLayoutManager manager = new LinearLayoutManager(this);
@@ -331,7 +330,7 @@ public class TranslateActivity extends AppCompatActivity {
         }
         final String translateResult = translate.getTrans_result().get(0).getDst();
         TalkAll talkAll = new TalkAll();
-        talkAll.setText(translateResult);
+        talkAll.setTranslateText(translateResult);
         talkAll.setWho(mWho);
         talkAll.setYuanWen(yuanWen);
         talkAlls.add(talkAll);
@@ -342,7 +341,7 @@ public class TranslateActivity extends AppCompatActivity {
             public void run() {
                 adapter.notifyDataSetChanged();
                 recyclerView.scrollToPosition(adapter.getItemCount() - 1);
-//                showTrans.setText(translateResult);
+//                showTrans.setTranslateText(translateResult);
             }
         });
         getTtsBinder.speak(translateResult);
@@ -485,6 +484,7 @@ public class TranslateActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 startTranslate(transApi);
+                editText.setText("");
             }
         });
     }

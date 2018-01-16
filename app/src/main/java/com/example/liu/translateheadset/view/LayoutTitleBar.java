@@ -136,7 +136,7 @@ public class LayoutTitleBar extends RelativeLayout {
 //            //设置右边按钮的文字
 //            String rightButtonText = typedArray.getString(R.styleable.LayoutTitleBar_right_button_text);
 //            if (!TextUtils.isEmpty(rightButtonText)) {
-//                titleBarRightBtn.setText(rightButtonText);
+//                titleBarRightBtn.setTranslateText(rightButtonText);
 //                //设置右边按钮文字颜色
 //                int rightButtonTextColor = typedArray.getColor(R.styleable.LayoutTitleBar_right_button_text_color, Color.BLUE);
 //                titleBarRightBtn.setTextColor(rightButtonTextColor);

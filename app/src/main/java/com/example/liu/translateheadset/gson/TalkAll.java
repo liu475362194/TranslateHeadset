@@ -6,7 +6,7 @@ package com.example.liu.translateheadset.gson;
 
 public class TalkAll {
     private int who;
-    private String text;
+    private String translateText;
     private String yuanWen;
 
     public String getYuanWen() {
@@ -25,11 +25,11 @@ public class TalkAll {
         this.who = who;
     }
 
-    public String getText() {
-        return text;
+    public String getTranslateText() {
+        return translateText;
     }
 
-    public void setText(String text) {
-        this.text = text;
+    public void setTranslateText(String translateText) {
+        this.translateText = translateText;
     }
 }

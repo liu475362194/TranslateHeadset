@@ -39,7 +39,7 @@
             android:hint="请说‘翻译中文’或‘翻译英语’来唤醒" />
         <Button
             android:id="@+id/send"
-            android:text="发送"
+            android:translateText="发送"
             android:textSize="12sp"
             android:layout_width="50dp"
             android:layout_height="50dp" />
@@ -58,14 +58,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="@string/translate_zh" />
+            android:translateText="@string/translate_zh" />
 
         <Button
             android:id="@+id/start_trans_en"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="@string/translate_en" />
+            android:translateText="@string/translate_en" />
     </LinearLayout>
 
     <!--<TextView-->

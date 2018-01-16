@@ -12,13 +12,13 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="25sp"
-            android:text="111111111"
+            android:translateText="111111111"
             />
         <TextView
             android:id="@+id/device_address"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="22222222222"
+            android:translateText="22222222222"
             android:layout_marginTop="5px"/>
     </LinearLayout>
 </RelativeLayout>
