@@ -30,7 +30,7 @@ import android.widget.Toast;
 
 import com.example.liu.translateheadset.Constant;
 import com.example.liu.translateheadset.R;
-import com.example.liu.translateheadset.baidutranslate.TranslateHelper;
+import com.example.liu.translateheadset.translate.TranslateHelper;
 import com.example.liu.translateheadset.gson.Error;
 import com.example.liu.translateheadset.gson.Message;
 import com.example.liu.translateheadset.gson.Speak;

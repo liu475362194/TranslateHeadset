@@ -1,6 +1,4 @@
-package com.example.liu.translateheadset.baidutranslate;
-
-import android.util.Log;
+package com.example.liu.translateheadset.translate;
 
 import com.example.liu.translateheadset.util.HttpGet;
 import com.example.liu.translateheadset.util.MD5;
@@ -10,19 +8,17 @@ import java.util.Map;
 
 import okhttp3.Callback;
 
-import static android.content.ContentValues.TAG;
-
 /**
  * Created by pzbz025 on 2017/11/14.
  */
 
-public class TransApi {
+public class BaiduApi {
     private static final String TRANS_API_HOST = "http://api.fanyi.baidu.com/api/trans/vip/translate";
 
     private String appid;
     private String securityKey;
 
-    public TransApi(String appid, String securityKey) {
+    public BaiduApi(String appid, String securityKey) {
         this.appid = appid;
         this.securityKey = securityKey;
     }

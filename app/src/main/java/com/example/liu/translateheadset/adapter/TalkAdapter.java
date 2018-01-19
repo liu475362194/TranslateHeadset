@@ -56,7 +56,7 @@ public class TalkAdapter extends RecyclerView.Adapter<TalkAdapter.ViewHolder> {
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
 //        if (talkAlls.get(position).getWho() == 0){
-            holder.translateText.setText(talkAlls.get(position).getTranslateText());
+            holder.text.setText(talkAlls.get(position).getTranslateText());
             holder.yuanWen.setText(talkAlls.get(position).getYuanWen());
             holder.layout.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -88,14 +88,14 @@ public class TalkAdapter extends RecyclerView.Adapter<TalkAdapter.ViewHolder> {
 
     class ViewHolder extends RecyclerView.ViewHolder{
 
-        private TextView translateText;
+        private TextView text;
         private TextView yuanWen;
         private LinearLayout layout;
 
         public ViewHolder(View itemView) {
             super(itemView);
             layout = itemView.findViewById(R.id.layout);
-            translateText = itemView.findViewById(R.id.tv_chatcontent_translate);
+            text = itemView.findViewById(R.id.tv_chatcontent_translate);
             yuanWen = itemView.findViewById(R.id.tv_chatcontent);
         }
 

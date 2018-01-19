@@ -18,7 +18,7 @@
             <!--android:layout_width="wrap_content"-->
             <!--android:layout_height="wrap_content"-->
             <!--android:layout_centerInParent="true"-->
-            <!--andrtranslateTexttext="申请好友"-->
+            <!--andrtexttext="申请好友"-->
             <!--android:textColor="#fff"-->
             <!--android:textSize="18sp" />-->
     <!--</RelativeLayout>-->
@@ -48,7 +48,7 @@
         android:layout_height="54dp"
         android:layout_margin="20dp"
         android:background="#000"
-        android:translateText="发出申请"
+        android:text="发出申请"
         android:textColor="#fff"
         android:textSize="16sp" />
 

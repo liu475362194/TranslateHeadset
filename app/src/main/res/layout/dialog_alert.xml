@@ -17,7 +17,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="5dp"
-            android:translateText="@string/prompt"
+            android:text="@string/prompt"
             android:textColor="#333"
             android:visibility="visible"
             android:textSize="20sp" />
@@ -67,7 +67,7 @@
             android:background="#4ee345"
             android:gravity="center"
             android:onClick="cancel"
-            android:translateText="@string/cancel"
+            android:text="@string/cancel"
             android:textColor="#666666"
             android:textSize="16sp"
             android:visibility="gone" />
@@ -80,7 +80,7 @@
             android:background="#215444"
             android:gravity="center"
             android:onClick="ok"
-            android:translateText="@string/ok"
+            android:text="@string/ok"
             android:textColor="#fff"
             android:textSize="16sp" />
     </LinearLayout>

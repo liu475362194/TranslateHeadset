@@ -17,7 +17,7 @@
             <!--android:layout_width="wrap_content"-->
             <!--android:layout_height="wrap_content"-->
             <!--android:layout_centerInParent="true"-->
-            <!--andrtranslateTexttext="主页"-->
+            <!--andrtexttext="主页"-->
             <!--android:textColor="#fff"-->
             <!--android:textSize="18sp" />-->
     <!--</RelativeLayout>-->
@@ -38,7 +38,7 @@
         android:layout_margin="20dp"
         android:background="#000"
         android:padding="10dp"
-        android:translateText="会话列表"
+        android:text="会话列表"
         android:textColor="#fff"
         android:textSize="18sp" />
 
@@ -50,7 +50,7 @@
         android:layout_marginTop="20dp"
         android:background="#000"
         android:padding="10dp"
-        android:translateText="通讯录"
+        android:text="通讯录"
         android:textColor="#fff"
         android:textSize="18sp" />
 
@@ -62,7 +62,7 @@
         android:layout_marginTop="20dp"
         android:background="#000"
         android:padding="10dp"
-        android:translateText="好友申请"
+        android:text="好友申请"
         android:textColor="#fff"
         android:textSize="18sp" />
 
@@ -74,7 +74,7 @@
         android:layout_marginTop="20dp"
         android:background="#000"
         android:padding="10dp"
-        android:translateText="退出"
+        android:text="退出"
         android:textColor="#fff"
         android:textSize="18sp" />
 
@@ -86,7 +86,7 @@
         android:layout_marginTop="20dp"
         android:background="#000"
         android:padding="10dp"
-        android:translateText="本地翻译"
+        android:text="本地翻译"
         android:textColor="#fff"
         android:textSize="18sp" />
 </LinearLayout>

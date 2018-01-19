@@ -23,7 +23,7 @@ import android.widget.Toast;
 
 
 import com.example.liu.translateheadset.adapter.TalkAdapter;
-import com.example.liu.translateheadset.baidutranslate.TransApi;
+import com.example.liu.translateheadset.translate.BaiduApi;
 import com.example.liu.translateheadset.gson.Error;
 import com.example.liu.translateheadset.gson.Speak;
 import com.example.liu.translateheadset.gson.TalkAll;
@@ -60,7 +60,7 @@ public class TranslateActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private TalkAdapter adapter;
     private Gson gson;
-    private TransApi transApi;
+    private BaiduApi baiduApi;
     private Intent intentTts, intentSpeek, intentWakeUp;
     private BaiDuSpeekService.SpeekResultListener speekResultListener = new BaiDuSpeekService.SpeekResultListener() {
         @Override
@@ -82,7 +82,7 @@ public class TranslateActivity extends AppCompatActivity {
         @Override
         public void successSpeek(String string) {
 
-            startTranslate(transApi);
+            startTranslate(baiduApi);
             startTransZh.setClickable(true);
             startTransZh.setText(R.string.translate_zh);
             startTransEn.setClickable(true);
@@ -293,13 +293,13 @@ public class TranslateActivity extends AppCompatActivity {
         LinearLayoutManager manager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(manager);
         recyclerView.setAdapter(adapter);
-        transApi = new TransApi(APP_ID, SECURITY_KEY);
+        baiduApi = new BaiduApi(APP_ID, SECURITY_KEY);
         gson = new Gson();
         TimeStart2Stop.timeNeed(this,"initView",last);
     }
 
 
-    private void startTranslate(TransApi transApi) {
+    private void startTranslate(BaiduApi baiduApi) {
 
         final String query = editText.getText().toString();
         yuanWen = query;
@@ -309,7 +309,7 @@ public class TranslateActivity extends AppCompatActivity {
         }
         final String toText = isEnglish(query);
         Log.d(TAG, "startTrans: " + query);
-        transApi.getTransResult(query, "auto", toText, new Callback() {
+        baiduApi.getTransResult(query, "auto", toText, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
 
@@ -483,7 +483,7 @@ public class TranslateActivity extends AppCompatActivity {
         send.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startTranslate(transApi);
+                startTranslate(baiduApi);
                 editText.setText("");
             }
         });

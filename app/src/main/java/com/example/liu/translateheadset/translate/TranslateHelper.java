@@ -1,4 +1,4 @@
-package com.example.liu.translateheadset.baidutranslate;
+package com.example.liu.translateheadset.translate;
 
 import android.util.Log;
 
@@ -9,8 +9,6 @@ import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import okhttp3.Call;
-import okhttp3.Callback;
 import okhttp3.Response;
 
 /**
@@ -18,14 +16,14 @@ import okhttp3.Response;
  */
 
 public class TranslateHelper {
-    private TransApi transApi;
+    private BaiduApi baiduApi;
     private static final String APP_ID = "20171114000095150";
     private static final String SECURITY_KEY = "iKpMRhTW0IOBXJXbhNpw";
     private static final String TAG = "TranslateHelper";
     private Gson gson = new Gson();
 
     public TranslateHelper() {
-        transApi = new TransApi(APP_ID, SECURITY_KEY);
+        baiduApi = new BaiduApi(APP_ID, SECURITY_KEY);
     }
 
     public void startTranslate(String query, okhttp3.Callback callback){
@@ -35,7 +33,7 @@ public class TranslateHelper {
         final String toText = isEnglish(query);
         Log.d(TAG, "startTrans: " + query);
         String mResponse;
-        transApi.getTransResult(query, "auto", toText, callback);
+        baiduApi.getTransResult(query, "auto", toText, callback);
     }
 
     public String responseTrans(Response response) throws IOException {

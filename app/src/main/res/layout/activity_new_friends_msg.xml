@@ -18,7 +18,7 @@
             <!--android:layout_width="wrap_content"-->
             <!--android:layout_height="wrap_content"-->
             <!--android:layout_centerInParent="true"-->
-            <!--andrtranslateTexttext="@string/Application_and_notify"-->
+            <!--andrtexttext="@string/Application_and_notify"-->
             <!--android:textColor="#fff"-->
             <!--android:textSize="18sp" />-->
     <!--</RelativeLayout>-->

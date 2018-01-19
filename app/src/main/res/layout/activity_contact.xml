@@ -16,7 +16,7 @@
             <!--android:layout_width="wrap_content"-->
             <!--android:layout_height="wrap_content"-->
             <!--android:layout_centerInParent="true"-->
-            <!--andrtranslateTexttext="通讯录"-->
+            <!--andrtexttext="通讯录"-->
             <!--android:textColor="#fff"-->
             <!--android:textSize="18sp" />-->
 
@@ -28,7 +28,7 @@
             <!--android:background="@null"-->
             <!--android:paddingLeft="10dp"-->
             <!--android:paddingRight="10dp"-->
-            <!--andrtranslateTexttext="添加好友"-->
+            <!--andrtexttext="添加好友"-->
             <!--android:textColor="#fff"-->
             <!--android:textSize="14sp" />-->
     <!--</RelativeLayout>-->

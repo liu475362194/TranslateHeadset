@@ -35,6 +35,7 @@ import static android.content.ContentValues.TAG;
 public class HttpGet {
     protected static final int SOCKET_TIMEOUT = 10000; // 10S
     protected static final String GET = "GET";
+    private static final String TAG = "HttpGet";
 
     public static void get(String host, Map<String, String> params, final okhttp3.Callback callback) {
         try {
@@ -42,6 +43,8 @@ public class HttpGet {
             SSLContext sslcontext = SSLContext.getInstance("TLS");
             sslcontext.init(null, new TrustManager[] { myX509TrustManager }, null);
 
+            //将请求的地址值和需要的配置项以键值对（params）的形式封装并由getUrlWithQueryString拼接起来
+            //getUrlWithQueryString方法最后返回最终的请求地址sendUrl
             final String sendUrl = getUrlWithQueryString(host, params);
 
             // System.out.println("URL:" + sendUrl);
@@ -50,6 +53,7 @@ public class HttpGet {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
+                    //发送请求,并通过callback通知
                     OkHttpClient client = new OkHttpClient();
                     Request request = new Request.Builder().url(sendUrl).build();
                     client.newCall(request).enqueue(callback);
@@ -97,11 +101,18 @@ public class HttpGet {
         }
     }
 
+    /**
+     * 将请求的地址值和需要的配置项以键值对（params）的形式封装并由getUrlWithQueryString拼接起来
+     * @param url 请求的地址
+     * @param params 所有配置项
+     * @return 最终拼接成的地址
+     */
     public static String getUrlWithQueryString(String url, Map<String, String> params) {
         if (params == null) {
             return url;
         }
 
+        //如果给的请求地址包含 ? 就说明已含有至少一个配置项，就在最后加 &，否则加 ?
         StringBuilder builder = new StringBuilder(url);
         if (url.contains("?")) {
             builder.append("&");
@@ -110,7 +121,9 @@ public class HttpGet {
         }
 
         int i = 0;
+        Log.d(TAG, "-------------------------------------------------------------------------------");
         for (String key : params.keySet()) {
+            Log.d(TAG, "key= "+ key + " and value= " + params.get(key));
             String value = params.get(key);
             if (value == null) { // 过滤空的key
                 continue;

@@ -16,14 +16,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="10sp"
-            android:translateText="111111111"
+            android:text="111111111"
             android:textColor="#fff"/>
         <TextView
             android:id="@+id/text_show"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
 
-            android:translateText="111111111111111111"
+            android:text="111111111111111111"
             android:textSize="20sp"/>
     </LinearLayout>
 

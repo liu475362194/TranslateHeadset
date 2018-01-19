@@ -59,7 +59,7 @@
             android:onClick="register"
             android:paddingBottom="7dp"
             android:paddingTop="7dp"
-            android:translateText="@string/register"
+            android:text="@string/register"
             android:textColor="@android:color/white"
             android:textSize="20sp" />
     </LinearLayout>

@@ -30,14 +30,14 @@
             android:layout_marginTop="3dp"
             android:background="@drawable/ease_unread_count_bg"
             android:gravity="center"
-            android:translateText="7"
+            android:text="7"
             android:textColor="@android:color/white"
             android:textSize="12sp" />
     </RelativeLayout>
 
     <TextView
         android:id="@+id/name"
-        android:translateText="testdata"
+        android:text="testdata"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="7dp"
