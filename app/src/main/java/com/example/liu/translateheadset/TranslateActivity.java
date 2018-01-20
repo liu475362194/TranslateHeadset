@@ -1,11 +1,15 @@
 package com.example.liu.translateheadset;
 
 import android.Manifest;
+import android.app.DownloadManager;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.os.IBinder;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -33,9 +37,11 @@ import com.example.liu.translateheadset.gson.WakeUp;
 import com.example.liu.translateheadset.services.BaiDuSpeekService;
 import com.example.liu.translateheadset.services.BaiDuTTSService;
 import com.example.liu.translateheadset.services.BaiduWakeUpService;
+import com.example.liu.translateheadset.translate.GoogleApi;
 import com.example.liu.translateheadset.util.TimeStart2Stop;
 import com.google.gson.Gson;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -82,7 +88,7 @@ public class TranslateActivity extends AppCompatActivity {
         @Override
         public void successSpeek(String string) {
 
-            startTranslate(baiduApi);
+            startTranslate();
             startTransZh.setClickable(true);
             startTransZh.setText(R.string.translate_zh);
             startTransEn.setClickable(true);
@@ -197,6 +203,7 @@ public class TranslateActivity extends AppCompatActivity {
         }
     };
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -206,6 +213,7 @@ public class TranslateActivity extends AppCompatActivity {
         initPermission();
 
         TimeStart2Stop.timeNeed(this,"onCreate",last);
+        registerReceiver(downloadReceiver,new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
     }
 
     /**
@@ -237,7 +245,7 @@ public class TranslateActivity extends AppCompatActivity {
 //        speekBinder.init(this);
 
 //        Intent intentWakeUp = new Intent(this, BaiduWakeUpService.class);
-        bindService(intentWakeUp, connectionWakeUp, BIND_AUTO_CREATE);
+//        bindService(intentWakeUp, connectionWakeUp, BIND_AUTO_CREATE);
 
         TimeStart2Stop.timeNeed(this,"initBinder",last);
     }
@@ -298,8 +306,10 @@ public class TranslateActivity extends AppCompatActivity {
         TimeStart2Stop.timeNeed(this,"initView",last);
     }
 
-
-    private void startTranslate(BaiduApi baiduApi) {
+    /**
+     * 开始进行语音翻译
+     */
+    private void startTranslate() {
 
         final String query = editText.getText().toString();
         yuanWen = query;
@@ -309,19 +319,65 @@ public class TranslateActivity extends AppCompatActivity {
         }
         final String toText = isEnglish(query);
         Log.d(TAG, "startTrans: " + query);
-        baiduApi.getTransResult(query, "auto", toText, new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
+//        baiduApi.getTransResult(query, "auto", toText, new Callback() {
+//            @Override
+//            public void onFailure(Call call, IOException e) {
+//
+//            }
+//
+//            @Override
+//            public void onResponse(Call call, Response response) throws IOException {
+//                responseTts(response);
+//            }
+//        });
 
-            }
 
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                responseTts(response);
-            }
-        });
+        //----------------测试---------------------------
+        GoogleApi.getInstance().setContext(this).getTransResult(query, "zh-CN", "en");
     }
 
+    private BroadcastReceiver downloadReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            checkDownloadStatus();
+        }
+    };
+
+    //检查下载状态
+    private void checkDownloadStatus() {
+        DownloadManager.Query query = new DownloadManager.Query();
+        query.setFilterById(GoogleApi.getInstance().mTaskId);//筛选下载任务，传入任务ID，可变参数
+        Cursor c = GoogleApi.getInstance().downloadManager.query(query);
+        if (c.moveToFirst()) {
+            int status = c.getInt(c.getColumnIndex(DownloadManager.COLUMN_STATUS));
+            switch (status) {
+                case DownloadManager.STATUS_PAUSED:
+                    Log.d(TAG, ">>>下载暂停");
+//                    MLog.i(">>>下载暂停");
+                case DownloadManager.STATUS_PENDING:
+                    Log.d(TAG, ">>>下载延迟");
+//                    MLog.i(">>>下载延迟");
+                case DownloadManager.STATUS_RUNNING:
+                    Log.d(TAG, ">>>正在下载");
+//                    MLog.i(">>>正在下载");
+                    break;
+                case DownloadManager.STATUS_SUCCESSFUL:
+                    Log.d(TAG, ">>>下载完成");
+//                    MLog.i(">>>下载完成");
+                    break;
+                case DownloadManager.STATUS_FAILED:
+                    Log.d(TAG, ">>>下载失败");
+//                    MLog.i(">>>下载失败");
+                    break;
+            }
+        }
+    }
+
+    /**
+     * 处理翻译请求返回的数据，解析出结果，并加入聊天消息列表。
+     * @param response
+     * @throws IOException
+     */
     private void responseTts(Response response) throws IOException {
         String result = response.body().string();
         Translate translate = gson.fromJson(result, Translate.class);
@@ -347,6 +403,11 @@ public class TranslateActivity extends AppCompatActivity {
         getTtsBinder.speak(translateResult);
     }
 
+    /**
+     * 处理语音识别请求返回的数据。
+     * @param string
+     * @throws IOException
+     */
     private void responseSpeak(String string) throws IOException {
         Log.d(TAG, "respinseSpeek: " + string);
         Speak speak = gson.fromJson(string, Speak.class);
@@ -483,7 +544,7 @@ public class TranslateActivity extends AppCompatActivity {
         send.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startTranslate(baiduApi);
+                startTranslate();
                 editText.setText("");
             }
         });

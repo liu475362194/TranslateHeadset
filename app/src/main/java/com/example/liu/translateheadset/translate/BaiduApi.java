@@ -25,7 +25,7 @@ public class BaiduApi {
 
     public void getTransResult(String query, String from, String to, Callback callback) {
         Map<String, String> params = buildParams(query, from, to);
-        HttpGet.get(TRANS_API_HOST, params, callback);
+        HttpGet.getInstance().get(TRANS_API_HOST, params, callback);
     }
 
     private Map<String, String> buildParams(String query, String from, String to) {

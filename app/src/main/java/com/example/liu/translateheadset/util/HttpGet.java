@@ -36,8 +36,17 @@ public class HttpGet {
     protected static final int SOCKET_TIMEOUT = 10000; // 10S
     protected static final String GET = "GET";
     private static final String TAG = "HttpGet";
+    private static HttpGet instance;
 
-    public static void get(String host, Map<String, String> params, final okhttp3.Callback callback) {
+    public static HttpGet getInstance(){
+        if (instance != null){
+            return instance;
+        }
+        instance = new HttpGet();
+        return instance;
+    }
+
+    public void get(String host, Map<String, String> params, final okhttp3.Callback callback) {
         try {
             // 设置SSLContext
             SSLContext sslcontext = SSLContext.getInstance("TLS");
@@ -107,7 +116,7 @@ public class HttpGet {
      * @param params 所有配置项
      * @return 最终拼接成的地址
      */
-    public static String getUrlWithQueryString(String url, Map<String, String> params) {
+    public String getUrlWithQueryString(String url, Map<String, String> params) {
         if (params == null) {
             return url;
         }
