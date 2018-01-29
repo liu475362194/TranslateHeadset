@@ -62,7 +62,7 @@
         android:layout_marginTop="20dp"
         android:background="#000"
         android:padding="10dp"
-        android:text="好友申请"
+        android:text="申请与通知"
         android:textColor="#fff"
         android:textSize="18sp" />
 

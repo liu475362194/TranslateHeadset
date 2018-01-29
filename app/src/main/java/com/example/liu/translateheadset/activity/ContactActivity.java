@@ -48,14 +48,14 @@ public class ContactActivity extends BaseActivity {
 //			}
 //
 //		});
-		ImageView imageView = this.findViewById(R.id.title_bar_right);
-		imageView.setImageDrawable(getResources().getDrawable(R.drawable.ic_action_add_pressed));
-		imageView.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View view) {
-				startActivity(new Intent(ContactActivity.this, AddContactActivity.class));
-			}
-		});
+//		ImageView imageView = this.findViewById(R.id.title_bar_right);
+//		imageView.setImageDrawable(getResources().getDrawable(R.drawable.ic_action_add_pressed));
+//		imageView.setOnClickListener(new OnClickListener() {
+//			@Override
+//			public void onClick(View view) {
+//				startActivity(new Intent(ContactActivity.this, AddContactActivity.class));
+//			}
+//		});
 		listView = (ListView) this.findViewById(R.id.listView);
 		getContactList();
 		adapter = new ContactAdapter(this, contactList);

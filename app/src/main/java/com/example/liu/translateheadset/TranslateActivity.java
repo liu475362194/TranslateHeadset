@@ -10,6 +10,7 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.os.Environment;
 import android.os.IBinder;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -41,8 +42,12 @@ import com.example.liu.translateheadset.translate.GoogleApi;
 import com.example.liu.translateheadset.util.TimeStart2Stop;
 import com.google.gson.Gson;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -208,33 +213,33 @@ public class TranslateActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_translate);
-        long last = TimeStart2Stop.timeNeed(this,"onCreate",-1);
+        long last = TimeStart2Stop.timeNeed(this, "onCreate", -1);
         initView();
         initPermission();
 
-        TimeStart2Stop.timeNeed(this,"onCreate",last);
-        registerReceiver(downloadReceiver,new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
+        TimeStart2Stop.timeNeed(this, "onCreate", last);
+        registerReceiver(downloadReceiver, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
     }
 
     /**
      * 启动服务
      */
     private void initService() {
-        long last = TimeStart2Stop.timeNeed(this,"initService",-1);
+        long last = TimeStart2Stop.timeNeed(this, "initService", -1);
         intentTts = new Intent(TranslateActivity.this, BaiDuTTSService.class);
         startService(intentTts);
         intentSpeek = new Intent(this, BaiDuSpeekService.class);
         startService(intentSpeek);
         intentWakeUp = new Intent(this, BaiduWakeUpService.class);
         startService(intentWakeUp);
-        TimeStart2Stop.timeNeed(this,"initService",last);
+        TimeStart2Stop.timeNeed(this, "initService", last);
     }
 
     /**
      * 初始化Binder服务
      */
     private void initBinder() {
-        long last = TimeStart2Stop.timeNeed(this,"initBinder",-1);
+        long last = TimeStart2Stop.timeNeed(this, "initBinder", -1);
 
 //        Intent intentTts = new Intent(this, BaiDuTTSService.class);
         bindService(intentTts, connectionTts, BIND_AUTO_CREATE);
@@ -247,14 +252,14 @@ public class TranslateActivity extends AppCompatActivity {
 //        Intent intentWakeUp = new Intent(this, BaiduWakeUpService.class);
 //        bindService(intentWakeUp, connectionWakeUp, BIND_AUTO_CREATE);
 
-        TimeStart2Stop.timeNeed(this,"initBinder",last);
+        TimeStart2Stop.timeNeed(this, "initBinder", last);
     }
 
     /**
      * 关闭服务
      */
     private void closeService() {
-        long last = TimeStart2Stop.timeNeed(this,"closeService",-1);
+        long last = TimeStart2Stop.timeNeed(this, "closeService", -1);
 
         if (connectionTts != null) {
             unbindService(connectionTts);
@@ -274,14 +279,14 @@ public class TranslateActivity extends AppCompatActivity {
             stopService(intentTts);
         if (intentWakeUp != null)
             stopService(intentWakeUp);
-        TimeStart2Stop.timeNeed(this,"closeService",last);
+        TimeStart2Stop.timeNeed(this, "closeService", last);
     }
 
     /**
      * 初始化界面
      */
     private void initView() {
-        long last = TimeStart2Stop.timeNeed(this,"initView",-1);
+        long last = TimeStart2Stop.timeNeed(this, "initView", -1);
         editText = findViewById(R.id.edit_text);
         startTransZh = findViewById(R.id.start_trans_zh);
         startTransEn = findViewById(R.id.start_trans_en);
@@ -303,7 +308,7 @@ public class TranslateActivity extends AppCompatActivity {
         recyclerView.setAdapter(adapter);
         baiduApi = new BaiduApi(APP_ID, SECURITY_KEY);
         gson = new Gson();
-        TimeStart2Stop.timeNeed(this,"initView",last);
+        TimeStart2Stop.timeNeed(this, "initView", last);
     }
 
     /**
@@ -333,7 +338,7 @@ public class TranslateActivity extends AppCompatActivity {
 
 
         //----------------测试---------------------------
-        GoogleApi.getInstance().setContext(this).getTransResult(query, "zh-CN", "en");
+        GoogleApi.getInstance().setContext(TranslateActivity.this).getTransResult(query, "zh-CN", "en");
     }
 
     private BroadcastReceiver downloadReceiver = new BroadcastReceiver() {
@@ -362,7 +367,28 @@ public class TranslateActivity extends AppCompatActivity {
 //                    MLog.i(">>>正在下载");
                     break;
                 case DownloadManager.STATUS_SUCCESSFUL:
-                    Log.d(TAG, ">>>下载完成");
+
+//                    创建文件对象，指向需要读取的文件
+                    StringBuffer sb = new StringBuffer();
+                    File file = new File(Environment.getExternalStorageDirectory() + "/GoogleTranslate/GoogleTranslate.txt");
+                    String line = "";
+                    try {
+                        InputStream instream = new FileInputStream(file);
+//                        创建文件Reader对象，读取指定的文件
+                        BufferedReader br = new BufferedReader(new FileReader(file));
+//                        创建一个line接受读取的文件内容，因为是文本文件，所以一行一行读
+                        while ((line = br.readLine()) != null) {
+                            sb.append(line);
+                        }
+//                        关闭文件读取对象
+                        br.close();
+                        Log.d(TAG, ">>>下载完成" + sb.toString());
+                        Log.d(TAG, ">>>下载完成: " + splitGoogleTranslate(sb.toString()));
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+
 //                    MLog.i(">>>下载完成");
                     break;
                 case DownloadManager.STATUS_FAILED:
@@ -373,8 +399,15 @@ public class TranslateActivity extends AppCompatActivity {
         }
     }
 
+    private String splitGoogleTranslate(String result) {
+        String[] temp;
+        temp = result.split("\"");
+        return temp[1];
+    }
+
     /**
      * 处理翻译请求返回的数据，解析出结果，并加入聊天消息列表。
+     *
      * @param response
      * @throws IOException
      */
@@ -405,6 +438,7 @@ public class TranslateActivity extends AppCompatActivity {
 
     /**
      * 处理语音识别请求返回的数据。
+     *
      * @param string
      * @throws IOException
      */
@@ -468,7 +502,7 @@ public class TranslateActivity extends AppCompatActivity {
      * android 6.0 以上需要动态申请权限
      */
     private void initPermission() {
-        long last = TimeStart2Stop.timeNeed(this,"initPermission",-1);
+        long last = TimeStart2Stop.timeNeed(this, "initPermission", -1);
         String permissions[] = {
                 Manifest.permission.RECORD_AUDIO,
                 Manifest.permission.INTERNET,
@@ -496,7 +530,7 @@ public class TranslateActivity extends AppCompatActivity {
             initService();
             initBinder();
         }
-        TimeStart2Stop.timeNeed(this,"initPermission",last);
+        TimeStart2Stop.timeNeed(this, "initPermission", last);
     }
 
     /**
@@ -510,7 +544,7 @@ public class TranslateActivity extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         // 此处为android 6.0以上动态授权的回调，用户自行实现。
         if (requestCode == 123) {
-            long last = TimeStart2Stop.timeNeed(TranslateActivity.this,"onRequestPermissionsResult",-1);
+            long last = TimeStart2Stop.timeNeed(TranslateActivity.this, "onRequestPermissionsResult", -1);
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 initService();
                 initBinder();
@@ -518,7 +552,7 @@ public class TranslateActivity extends AppCompatActivity {
                 Toast.makeText(TranslateActivity.this, "未获取到权限，请重新打开！", Toast.LENGTH_SHORT).show();
                 finish();
             }
-            TimeStart2Stop.timeNeed(TranslateActivity.this,"onRequestPermissionsResult",last);
+            TimeStart2Stop.timeNeed(TranslateActivity.this, "onRequestPermissionsResult", last);
         }
     }
 

@@ -1,8 +1,10 @@
 package com.example.liu.translateheadset.activity;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.ListView;
 
 
@@ -25,6 +27,15 @@ public class NewFriendsMsgActivity extends BaseActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_new_friends_msg);
+
+		ImageView imageView = this.findViewById(R.id.title_bar_right);
+		imageView.setImageDrawable(getResources().getDrawable(R.drawable.ic_action_add_pressed));
+		imageView.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				startActivity(new Intent(NewFriendsMsgActivity.this, AddContactActivity.class));
+			}
+		});
 
 		listView = (ListView) findViewById(R.id.list);
 		InviteMessgeDao dao = new InviteMessgeDao(this);

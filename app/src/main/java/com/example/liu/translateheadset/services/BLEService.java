@@ -13,6 +13,7 @@ import android.widget.Toast;
 
 import com.example.liu.translateheadset.adapter.DeviceAdapter;
 import com.example.liu.translateheadset.util.TimeStart2Stop;
+import com.kaopiz.kprogresshud.KProgressHUD;
 import com.vise.baseble.ViseBle;
 import com.vise.baseble.callback.IBleCallback;
 import com.vise.baseble.callback.IConnectCallback;
@@ -47,8 +48,8 @@ public class BLEService extends Service {
 //    private UUID characteristicUUID = UUID.fromString("65786365-6c70-6f69-6e74-2e636f810001");
 //    private UUID descriptorsUUID = UUID.fromString("0x2902");
 
-    private UUID serviceUUID = UUID.fromString("65786365-6c70-6f69-6e74-2e636f6d0000");
-    private UUID characteristicUUID = UUID.fromString("65786365-6c70-6f69-6e74-2e636f6d0001");
+    private UUID serviceUUID;
+    private UUID characteristicUUID;
 
     private static final String TAG = "BLEService";
 
@@ -102,7 +103,7 @@ public class BLEService extends Service {
         @Override
         public void onDeviceFound(BluetoothLeDevice bluetoothLeDevice) {
             Log.i(TAG, "找到新设备 " + bluetoothLeDevice);
-            if (bluetoothLeDeviceStore != null) {
+            if (bluetoothLeDeviceStore != null && !bluetoothLeDevice.getAdRecordStore().getLocalNameComplete().equals("")) {
                 bluetoothLeDeviceStore.addDevice(bluetoothLeDevice);
                 bluetoothLeDeviceList = bluetoothLeDeviceStore.getDeviceList();
                 addBroadcast("com.example.broadcasttest.DEVICE_FOUND");
@@ -171,7 +172,18 @@ public class BLEService extends Service {
                 if (gattServer.getUuid().toString().equals("65786365-6c70-6f69-6e74-2e636f810000")) {
                     serviceUUID = UUID.fromString("65786365-6c70-6f69-6e74-2e636f810000");
                     characteristicUUID = UUID.fromString("65786365-6c70-6f69-6e74-2e636f810001");
+                    break;
                 }
+                if (gattServer.getUuid().toString().equals("65786365-6c70-6f69-6e74-2e636f6d0000")){
+                    serviceUUID = UUID.fromString("65786365-6c70-6f69-6e74-2e636f6d0000");
+                    characteristicUUID = UUID.fromString("65786365-6c70-6f69-6e74-2e636f6d0001");
+                    break;
+                }
+            }
+
+            if (serviceUUID == null){
+                addBroadcast("com.example.broadcasttest.CONNECT_FAILURE");
+                return;
             }
 
             GattChannelConnect(deviceMirror, serviceUUID, characteristicUUID);
@@ -182,8 +194,7 @@ public class BLEService extends Service {
         @Override
         public void onConnectFailure(BleException exception) {
             Log.e(TAG, "onConnectFailure: ");
-//            kProgressHUD.dismiss();
-            addBroadcast("com.example.broadcasttest.CONNECT_FAILURE");
+//            addBroadcast("com.example.broadcasttest.CONNECT_FAILURE");
 //            Toast.makeText(BLEService.this, "连接失败，请重试！", Toast.LENGTH_SHORT).show();
             isBLESuccess = false;
         }

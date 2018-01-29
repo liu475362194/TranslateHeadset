@@ -85,20 +85,34 @@ public class MsgConnectionServices extends Service {
 
                             @Override
                             public void onError(int i, String s) {
-
+                                showToash("连接不到聊天服务器");
                             }
 
                             @Override
                             public void onProgress(int i, String s) {
 
+
                             }
                         });
+
+
+
+
+
+
+
+
+
+
+
+
+
                     } else {
                         if (NetUtils.hasNetwork(MsgConnectionServices.this)) {
                             //连接不到聊天服务器
-                            Log.d(TAG, "run: 连接不到聊天服务器");
+                            Log.d(TAG, "Network success");
 //                            Toast.makeText(getApplicationContext(),"连接不到聊天服务器",Toast.LENGTH_SHORT).show();
-                            showToash("连接不到聊天服务器");
+//                            showToash("连接不到聊天服务器");
                         } else {
                             //当前网络不可用，请检查网络设置
                             Log.d(TAG, "run: 当前网络不可用，请检查网络设置");
