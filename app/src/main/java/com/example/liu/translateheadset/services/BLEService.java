@@ -181,7 +181,9 @@ public class BLEService extends Service {
                 }
             }
 
+            //连接成不支持的设备
             if (serviceUUID == null){
+                ViseBle.getInstance().disconnect();
                 addBroadcast("com.example.broadcasttest.CONNECT_FAILURE");
                 return;
             }

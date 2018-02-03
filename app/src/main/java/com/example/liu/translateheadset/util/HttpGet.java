@@ -144,8 +144,8 @@ public class HttpGet {
 
             builder.append(key);
             builder.append('=');
-//            builder.append(encode(value));
-            builder.append(value);
+            builder.append(encode(value));
+//            builder.append(value);
 
             i++;
         }

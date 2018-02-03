@@ -250,7 +250,7 @@ public class TranslateActivity extends AppCompatActivity {
 //        speekBinder.init(this);
 
 //        Intent intentWakeUp = new Intent(this, BaiduWakeUpService.class);
-//        bindService(intentWakeUp, connectionWakeUp, BIND_AUTO_CREATE);
+        bindService(intentWakeUp, connectionWakeUp, BIND_AUTO_CREATE);
 
         TimeStart2Stop.timeNeed(this, "initBinder", last);
     }
@@ -324,21 +324,21 @@ public class TranslateActivity extends AppCompatActivity {
         }
         final String toText = isEnglish(query);
         Log.d(TAG, "startTrans: " + query);
-//        baiduApi.getTransResult(query, "auto", toText, new Callback() {
-//            @Override
-//            public void onFailure(Call call, IOException e) {
-//
-//            }
-//
-//            @Override
-//            public void onResponse(Call call, Response response) throws IOException {
-//                responseTts(response);
-//            }
-//        });
+        baiduApi.getTransResult(query, "auto", toText, new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                responseTts(response);
+            }
+        });
 
 
         //----------------测试---------------------------
-        GoogleApi.getInstance().setContext(TranslateActivity.this).getTransResult(query, "zh-CN", "en");
+//        GoogleApi.getInstance().setContext(TranslateActivity.this).getTransResult(query, "zh-CN", "en");
     }
 
     private BroadcastReceiver downloadReceiver = new BroadcastReceiver() {
