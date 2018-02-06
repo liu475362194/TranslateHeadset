@@ -19,7 +19,6 @@
     <string name="login_on_line">登录在线</string>
 
 
-
     <!--<string name="app_name">环信DEMO(精简版)</string>-->
     <string name="app_slogon">即时通讯云领导者</string>
     <string name="text_ack_msg">已读</string>
@@ -307,7 +306,7 @@
     <string name="update_black_list_failed">更新黑名单失败</string>
     <string name="update_groups_failed">更新群聊失败</string>
 
-    <string name= "no_more_messages">没有更多的消息了</string>
+    <string name="no_more_messages">没有更多的消息了</string>
     <string name="join_public_group">加入公开群</string>
     <string name="chatroom_allow_owner_leave"> 允许聊天室群主离开</string>
     <string name="delete_msg_when_exit_group">退出群组时删除聊天数据</string>
