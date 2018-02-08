@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -30,16 +32,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-public class ContactActivity extends BaseActivity {
+public class ContactActivity extends Fragment {
 
 	protected List<EaseUser> contactList = new ArrayList<EaseUser>();
 	protected ListView listView;
 	private Map<String, EaseUser> contactsMap;
 	private ContactAdapter adapter;
 
-	protected void onCreate(Bundle arg0) {
+	public void onCreate(Bundle arg0) {
 		super.onCreate(arg0);
-		setContentView(R.layout.activity_contact);
+//		setContentView(R.layout.activity_contact);
 //		this.findViewById(R.id.btn_add).setOnClickListener(new OnClickListener() {
 //
 //			@Override
@@ -56,20 +58,48 @@ public class ContactActivity extends BaseActivity {
 //				startActivity(new Intent(ContactActivity.this, AddContactActivity.class));
 //			}
 //		});
-		listView = (ListView) this.findViewById(R.id.listView);
+
+
+
+//		listView = (ListView) this.findViewById(R.id.listView);
+//		getContactList();
+//		adapter = new ContactAdapter(this, contactList);
+//		listView.setAdapter(adapter);
+//		listView.setOnItemClickListener(new OnItemClickListener() {
+//
+//			@Override
+//			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
+//				startActivity(new Intent(ContactActivity.this,ChatActivity.class).putExtra("username", adapter.getItem(arg2).getUsername()));
+//				finish();
+//			}
+//
+//		});
+
+	}
+
+	@Nullable
+	@Override
+	public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+		return inflater.inflate(R.layout.activity_contact,container,false);
+	}
+
+	@Override
+	public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+		super.onViewCreated(view, savedInstanceState);
+
+		listView = (ListView) view.findViewById(R.id.listView);
 		getContactList();
-		adapter = new ContactAdapter(this, contactList);
+		adapter = new ContactAdapter(getActivity(), contactList);
 		listView.setAdapter(adapter);
 		listView.setOnItemClickListener(new OnItemClickListener() {
 
 			@Override
 			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
-				startActivity(new Intent(ContactActivity.this,ChatActivity.class).putExtra("username", adapter.getItem(arg2).getUsername()));
-				finish();
+				startActivity(new Intent(getActivity(),ChatActivity.class).putExtra("username", adapter.getItem(arg2).getUsername()));
+//				getActivity().finish();
 			}
 
 		});
-
 	}
 
 	/**

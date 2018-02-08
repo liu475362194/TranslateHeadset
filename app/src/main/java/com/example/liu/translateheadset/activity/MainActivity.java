@@ -57,7 +57,7 @@ public class MainActivity extends BaseActivity implements OnClickListener {
         switch (v.getId()) {
 
             case R.id.btn_conversation:
-                startActivity(new Intent(MainActivity.this, ConversationActivity.class));
+                startActivity(new Intent(MainActivity.this, MainTabActivity.class));
                 break;
             case R.id.btn_contact:
                 startActivity(new Intent(MainActivity.this, ContactActivity.class));

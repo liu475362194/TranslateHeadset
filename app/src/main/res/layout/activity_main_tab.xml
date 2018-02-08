@@ -16,9 +16,10 @@
         android:id="@+id/tab_layout"
         android:layout_width="match_parent"
         android:layout_height="60dp"
-        app:tabTextColor="#393939"
-        app:tabSelectedTextColor="#000"
-        app:tabIndicatorHeight="0dp">
+        app:tabTextColor="@color/common_bottom_bar_normal_bg"
+        app:tabSelectedTextColor="@color/btn_login_normal"
+        app:tabIndicatorColor="@color/colorAccent"
+        app:tabIndicatorHeight="3dp">
 
     </android.support.design.widget.TabLayout>
 </LinearLayout>

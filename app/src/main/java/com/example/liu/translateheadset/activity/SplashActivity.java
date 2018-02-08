@@ -65,6 +65,7 @@ public class SplashActivity extends BaseActivity {
                 //进入到这里代表没有权限.
 //                Toast.makeText(SplashActivity.this, "未获取到权限，请重新打开！", Toast.LENGTH_SHORT).show();
 //                finish();
+//                Toast.makeText(SplashActivity.this,"没权限",Toast.LENGTH_SHORT).show();
             }
         }
         String tmpList[] = new String[toApplyList.size()];
@@ -122,7 +123,7 @@ public class SplashActivity extends BaseActivity {
                         }
                     }
                     //进入主页面
-                    startActivity(new Intent(SplashActivity.this, MainActivity.class));
+                    startActivity(new Intent(SplashActivity.this, MainTabActivity.class));
                     finish();
                 } else {
                     try {

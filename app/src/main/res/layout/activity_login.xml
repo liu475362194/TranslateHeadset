@@ -90,6 +90,19 @@
             android:text="@string/login"
             android:textColor="@android:color/white"
             android:textSize="18sp" />
+
     </LinearLayout>
 
+    <Button
+        android:id="@+id/btn_local"
+        android:layout_width="match_parent"
+        android:layout_height="54dp"
+        android:layout_margin="20dp"
+        android:layout_marginTop="20dp"
+        android:onClick="local"
+        android:background="#000"
+        android:padding="10dp"
+        android:text="本地翻译"
+        android:textColor="#fff"
+        android:textSize="18sp" />
 </LinearLayout>

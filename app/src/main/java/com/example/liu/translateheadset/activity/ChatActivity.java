@@ -11,6 +11,8 @@ import android.content.ServiceConnection;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 import android.util.Log;
@@ -160,6 +162,7 @@ public class ChatActivity extends BaseActivity {
         localBroadcastManager.registerReceiver(notifyReceiver, intentFilter);
         TimeStart2Stop.timeNeed(ChatActivity.this, "onCreate", last);
     }
+
 
     /**
      * 收到指令广播的广播接收器

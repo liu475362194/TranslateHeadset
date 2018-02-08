@@ -4,6 +4,9 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -32,22 +35,59 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-public class ConversationActivity extends BaseActivity {
+public class ConversationActivity extends Fragment {
 
     private ListView listView;
 
     private List<EMConversation> conversationList = new ArrayList<EMConversation>();
     private EaseConversationAdapater adapter;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        long last = TimeStart2Stop.timeNeed(ConversationActivity.this,"onCreate",-1);
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_conversation);
+    private static final String TAG = "ConversationActivity";
 
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+//        setContentView(R.layout.activity_conversation);
+
+//        conversationList.addAll(loadConversationList());
+//        listView = (ListView) findViewById(R.id.listView);
+//        adapter = new EaseConversationAdapater(getActivity(), 1, conversationList);
+//        listView.setAdapter(adapter);
+//        final String st2 = getResources().getString(R.string.Cant_chat_with_yourself);
+//        listView.setOnItemClickListener(new OnItemClickListener() {
+//
+//            @Override
+//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+//                EMConversation conversation = adapter.getItem(position);
+//                String username = conversation.getUserName();
+//                if (username.equals(DemoApplication.getInstance().getCurrentUserName()))
+//                    Toast.makeText(getActivity(), st2, Toast.LENGTH_SHORT).show();
+//                else {
+//                    // 进入聊天页面
+//                    Intent intent = new Intent(getActivity(), ChatActivity.class);
+//                    intent.putExtra("username", username);
+//                    startActivity(intent);
+//                }
+//            }
+//        });
         conversationList.addAll(loadConversationList());
-        listView = (ListView) findViewById(R.id.listView);
-        adapter = new EaseConversationAdapater(ConversationActivity.this, 1, conversationList);
+        EMClient.getInstance().chatManager().addMessageListener(msgListener);
+    }
+
+    @Nullable
+    @Override
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        Log.e(TAG, "onCreateView: ");
+        return inflater.inflate(R.layout.activity_conversation,container,false);
+    }
+
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        Log.e(TAG, "onViewCreated: ");
+
+        listView = (ListView) view.findViewById(R.id.listView);
+        adapter = new EaseConversationAdapater(getActivity(), 1, conversationList);
         listView.setAdapter(adapter);
         final String st2 = getResources().getString(R.string.Cant_chat_with_yourself);
         listView.setOnItemClickListener(new OnItemClickListener() {
@@ -57,28 +97,24 @@ public class ConversationActivity extends BaseActivity {
                 EMConversation conversation = adapter.getItem(position);
                 String username = conversation.getUserName();
                 if (username.equals(DemoApplication.getInstance().getCurrentUserName()))
-                    Toast.makeText(ConversationActivity.this, st2, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), st2, Toast.LENGTH_SHORT).show();
                 else {
                     // 进入聊天页面
-                    Intent intent = new Intent(ConversationActivity.this, ChatActivity.class);
+                    Intent intent = new Intent(getActivity(), ChatActivity.class);
                     intent.putExtra("username", username);
                     startActivity(intent);
                 }
             }
         });
-
-        EMClient.getInstance().chatManager().addMessageListener(msgListener);
-        TimeStart2Stop.timeNeed(ConversationActivity.this,"onCreate",last);
     }
-
 
     EMMessageListener msgListener = new EMMessageListener() {
 
         @Override
         public void onMessageReceived(List<EMMessage> messages) {
-            long last = TimeStart2Stop.timeNeed(ConversationActivity.this,"onMessageReceived",-1);
+            long last = TimeStart2Stop.timeNeed(getActivity(),"onMessageReceived",-1);
 
-            runOnUiThread(new Runnable() {
+            getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     adapter.notifyDataSetChanged();
@@ -87,7 +123,7 @@ public class ConversationActivity extends BaseActivity {
 
 
             // 收到消息
-            TimeStart2Stop.timeNeed(ConversationActivity.this,"onMessageReceived",last);
+            TimeStart2Stop.timeNeed(getActivity(),"onMessageReceived",last);
         }
 
         @Override
@@ -118,7 +154,7 @@ public class ConversationActivity extends BaseActivity {
      * @return +
      */
     protected List<EMConversation> loadConversationList() {
-        long last = TimeStart2Stop.timeNeed(ConversationActivity.this,"loadConversationList",-1);
+        long last = TimeStart2Stop.timeNeed(getActivity(),"loadConversationList",-1);
         // 获取所有会话，包括陌生人
         Map<String, EMConversation> conversations = EMClient.getInstance().chatManager().getAllConversations();
         // 过滤掉messages size为0的conversation
@@ -145,7 +181,7 @@ public class ConversationActivity extends BaseActivity {
         for (Pair<Long, EMConversation> sortItem : sortList) {
             list.add(sortItem.second);
         }
-        TimeStart2Stop.timeNeed(ConversationActivity.this,"loadConversationList",last);
+        TimeStart2Stop.timeNeed(getActivity(),"loadConversationList",last);
         return list;
     }
 
@@ -288,7 +324,7 @@ public class ConversationActivity extends BaseActivity {
     }
 
     @Override
-    protected void onResume() {
+    public void onResume() {
         super.onResume();
         adapter.notifyDataSetChanged();
     }

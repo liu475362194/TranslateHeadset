@@ -16,6 +16,7 @@ import android.widget.Toast;
 
 import com.example.liu.translateheadset.DemoApplication;
 import com.example.liu.translateheadset.R;
+import com.example.liu.translateheadset.TranslateActivity;
 import com.example.liu.translateheadset.db.DemoDBManager;
 import com.example.liu.translateheadset.db.EaseUser;
 import com.example.liu.translateheadset.util.EaseCommonUtils;
@@ -49,7 +50,7 @@ public class LoginActivity extends BaseActivity {
 		// 如果登录成功过，直接进入主页面
 		if (EMClient.getInstance().isLoggedInBefore()) {
 			autoLogin = true;
-			startActivity(new Intent(LoginActivity.this, MainActivity.class));
+			startActivity(new Intent(LoginActivity.this, MainTabActivity.class));
 
 			return;
 		}
@@ -136,7 +137,7 @@ public class LoginActivity extends BaseActivity {
  
 				// 进入主页面
 				Intent intent = new Intent(LoginActivity.this,
-						MainActivity.class);
+						MainTabActivity.class);
 				startActivity(intent);
 
 				finish();
@@ -191,6 +192,10 @@ public class LoginActivity extends BaseActivity {
 	 */
 	public void register(View view) {
 		startActivityForResult(new Intent(this, RegisterActivity.class), 0);
+	}
+
+	public void local(View view){
+		startActivity(new Intent(this, TranslateActivity.class));
 	}
 
 	@Override
