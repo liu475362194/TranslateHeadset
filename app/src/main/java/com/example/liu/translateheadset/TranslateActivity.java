@@ -27,6 +27,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
+import com.arialyy.annotations.Download;
+import com.arialyy.aria.core.Aria;
+import com.arialyy.aria.core.download.DownloadTask;
 import com.example.liu.translateheadset.adapter.TalkAdapter;
 import com.example.liu.translateheadset.translate.BaiduApi;
 import com.example.liu.translateheadset.gson.Error;
@@ -48,6 +51,7 @@ import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -60,7 +64,7 @@ import okhttp3.Response;
 public class TranslateActivity extends AppCompatActivity {
     private List<TalkAll> talkAlls = new ArrayList<>();
     private EditText editText;
-    private Button startTransZh, startTransEn;
+    private Button startTransZh, startTransEn, select;
     private Button send;
     private TextView showTrans;
     private static final String APP_ID = "20171114000095150";
@@ -216,9 +220,9 @@ public class TranslateActivity extends AppCompatActivity {
         long last = TimeStart2Stop.timeNeed(this, "onCreate", -1);
         initView();
         initPermission();
-
+        Aria.download(this).register();
         TimeStart2Stop.timeNeed(this, "onCreate", last);
-        registerReceiver(downloadReceiver, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
+//        registerReceiver(downloadReceiver, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
     }
 
     /**
@@ -294,6 +298,7 @@ public class TranslateActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.recycler);
         adapter = new TalkAdapter(talkAlls);
         send = findViewById(R.id.send);
+        select = findViewById(R.id.select);
         initClickListener();
         adapter.setmItemClickListener(new TalkAdapter.ItemClickListener() {
             @Override
@@ -324,80 +329,86 @@ public class TranslateActivity extends AppCompatActivity {
         }
         final String toText = isEnglish(query);
         Log.d(TAG, "startTrans: " + query);
-        baiduApi.getTransResult(query, "auto", toText, new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
 
+        if (select.getText().equals("百度")){
+            baiduApi.getTransResult(query, "auto", toText, new Callback() {
+                @Override
+                public void onFailure(Call call, IOException e) {
+
+                }
+
+                @Override
+                public void onResponse(Call call, Response response) throws IOException {
+                    responseTts(response);
+                }
+            });
+        } else {
+            if (toText.equals("en")){
+                GoogleApi.getInstance().setContext(TranslateActivity.this).getTransResult(query, "zh-CN", "en");
+            }else{
+                GoogleApi.getInstance().setContext(TranslateActivity.this).getTransResult(query, "en", "zh-CN");
             }
+        }
 
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                responseTts(response);
-            }
-        });
-
-
-        //----------------测试---------------------------
-//        GoogleApi.getInstance().setContext(TranslateActivity.this).getTransResult(query, "zh-CN", "en");
     }
 
-    private BroadcastReceiver downloadReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            checkDownloadStatus();
-        }
-    };
+//    private BroadcastReceiver downloadReceiver = new BroadcastReceiver() {
+//        @Override
+//        public void onReceive(Context context, Intent intent) {
+//            checkDownloadStatus();
+//        }
+//    };
 
     //检查下载状态
-    private void checkDownloadStatus() {
-        DownloadManager.Query query = new DownloadManager.Query();
-        query.setFilterById(GoogleApi.getInstance().mTaskId);//筛选下载任务，传入任务ID，可变参数
-        Cursor c = GoogleApi.getInstance().downloadManager.query(query);
-        if (c.moveToFirst()) {
-            int status = c.getInt(c.getColumnIndex(DownloadManager.COLUMN_STATUS));
-            switch (status) {
-                case DownloadManager.STATUS_PAUSED:
-                    Log.d(TAG, ">>>下载暂停");
-//                    MLog.i(">>>下载暂停");
-                case DownloadManager.STATUS_PENDING:
-                    Log.d(TAG, ">>>下载延迟");
-//                    MLog.i(">>>下载延迟");
-                case DownloadManager.STATUS_RUNNING:
-                    Log.d(TAG, ">>>正在下载");
-//                    MLog.i(">>>正在下载");
-                    break;
-                case DownloadManager.STATUS_SUCCESSFUL:
-
-//                    创建文件对象，指向需要读取的文件
-                    StringBuffer sb = new StringBuffer();
-                    File file = new File(Environment.getExternalStorageDirectory() + "/GoogleTranslate/GoogleTranslate.txt");
-                    String line = "";
-                    try {
-                        InputStream instream = new FileInputStream(file);
-//                        创建文件Reader对象，读取指定的文件
-                        BufferedReader br = new BufferedReader(new FileReader(file));
-//                        创建一个line接受读取的文件内容，因为是文本文件，所以一行一行读
-                        while ((line = br.readLine()) != null) {
-                            sb.append(line);
-                        }
-//                        关闭文件读取对象
-                        br.close();
-                        Log.d(TAG, ">>>下载完成" + sb.toString());
-                        Log.d(TAG, ">>>下载完成: " + splitGoogleTranslate(sb.toString()));
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-
-
-//                    MLog.i(">>>下载完成");
-                    break;
-                case DownloadManager.STATUS_FAILED:
-                    Log.d(TAG, ">>>下载失败");
-//                    MLog.i(">>>下载失败");
-                    break;
-            }
-        }
-    }
+//    private void checkDownloadStatus() {
+//        DownloadManager.Query query = new DownloadManager.Query();
+//        query.setFilterById(GoogleApi.getInstance().mTaskId);//筛选下载任务，传入任务ID，可变参数
+//        Cursor c = GoogleApi.getInstance().downloadManager.query(query);
+//        if (c.moveToFirst()) {
+//            int status = c.getInt(c.getColumnIndex(DownloadManager.COLUMN_STATUS));
+//            switch (status) {
+//                case DownloadManager.STATUS_PAUSED:
+//                    Log.d(TAG, ">>>下载暂停");
+////                    MLog.i(">>>下载暂停");
+//                case DownloadManager.STATUS_PENDING:
+//                    Log.d(TAG, ">>>下载延迟");
+////                    MLog.i(">>>下载延迟");
+//                case DownloadManager.STATUS_RUNNING:
+//                    Log.d(TAG, ">>>正在下载");
+////                    MLog.i(">>>正在下载");
+//                    break;
+//                case DownloadManager.STATUS_SUCCESSFUL:
+//
+////                    创建文件对象，指向需要读取的文件
+//                    StringBuffer sb = new StringBuffer();
+//                    File file = new File(Environment.getExternalStorageDirectory() + "/GoogleTranslate/GoogleTranslate.txt");
+//                    String line = "";
+//                    try {
+//                        InputStream instream = new FileInputStream(file);
+////                        创建文件Reader对象，读取指定的文件
+//                        BufferedReader br = new BufferedReader(new FileReader(file));
+////                        创建一个line接受读取的文件内容，因为是文本文件，所以一行一行读
+//                        while ((line = br.readLine()) != null) {
+//                            sb.append(line);
+//                        }
+////                        关闭文件读取对象
+//                        br.close();
+//                        Log.d(TAG, ">>>下载完成" + sb.toString());
+//                        Log.d(TAG, ">>>下载完成: " + splitGoogleTranslate(sb.toString()));
+//                    } catch (IOException e) {
+//                        e.printStackTrace();
+//                    }
+//
+//
+////                    MLog.i(">>>下载完成");
+//                    break;
+//                case DownloadManager.STATUS_FAILED:
+//                    Log.d(TAG, ">>>下载失败");
+////                    MLog.i(">>>下载失败");
+//                    break;
+//            }
+//        }
+//    }
 
     private String splitGoogleTranslate(String result) {
         String[] temp;
@@ -418,6 +429,10 @@ public class TranslateActivity extends AppCompatActivity {
             return;
         }
         final String translateResult = translate.getTrans_result().get(0).getDst();
+        addTalkAllList(translateResult);
+    }
+
+    private void addTalkAllList(String translateResult) {
         TalkAll talkAll = new TalkAll();
         talkAll.setTranslateText(translateResult);
         talkAll.setWho(mWho);
@@ -582,5 +597,61 @@ public class TranslateActivity extends AppCompatActivity {
                 editText.setText("");
             }
         });
+        select.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (select.getText().equals("百度")){
+                    select.setText("谷歌");
+                } else {
+                    select.setText("百度");
+                }
+            }
+        });
     }
+
+    @Download.onTaskComplete
+    void taskComplete(DownloadTask task) {
+//        Toast.makeText(this, "下载完成", Toast.LENGTH_SHORT).show();
+
+        String content = getGoogleContent();
+        String [] splitContent = content.split("\"");
+//        for (String str : splitContent){
+//            Log.d(TAG, "taskComplete: 分割文本： " + str);
+//        }
+        yuanWen = splitContent[3];
+        addTalkAllList(splitContent[1]);
+    }
+
+    private String getGoogleContent() {
+        String content = "";
+        try {
+            InputStream instream = new FileInputStream(new File(Environment.getExternalStorageDirectory() + "/GoogleTranslate/f.txt"));
+            if (instream != null) {
+                InputStreamReader inputreader
+                        =new InputStreamReader(instream, "UTF-8");
+                BufferedReader buffreader = new BufferedReader(inputreader);
+                String line="";
+                //分行读取
+                while (( line = buffreader.readLine()) != null) {
+                    content += line + "\n";
+                }
+                instream.close();       //关闭输入流
+            }
+        }
+        catch (java.io.FileNotFoundException e) {
+            Log.d("TestFile", "The File doesn't not exist.");
+        }
+        catch (IOException e)  {
+            Log.d("TestFile", e.getMessage());
+        }
+
+        Log.d(TAG, "taskComplete:获取内容为 " + content);
+        return content;
+    }
+
+    @Download.onTaskFail
+    void taskFail(DownloadTask task) {
+        Toast.makeText(this, "翻译失败", Toast.LENGTH_SHORT).show();
+    }
+
 }

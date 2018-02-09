@@ -6,7 +6,11 @@ import android.net.Uri;
 import android.os.Environment;
 import android.util.Log;
 import android.webkit.MimeTypeMap;
+import android.widget.Toast;
 
+import com.arialyy.annotations.Download;
+import com.arialyy.aria.core.Aria;
+import com.arialyy.aria.core.download.DownloadTask;
 import com.example.liu.translateheadset.util.HttpGet;
 import com.example.liu.translateheadset.util.TimeStart2Stop;
 
@@ -69,8 +73,8 @@ public class GoogleApi {
     public void getTransResult(String query, String from, String to) {
         Map<String, String> params = buildParams(query, from, to);
         String downloadUrl = HttpGet.getInstance().getUrlWithQueryString(TRANS_API_HOST, params);
-        download(downloadUrl,"GoogleTranslate.txt");
-
+//        download(downloadUrl,"GoogleTranslate.txt");
+        downloadAria(downloadUrl);
 //        downAsynFile(downloadUrl);
     }
 
@@ -210,5 +214,23 @@ public class GoogleApi {
             }
         });
     }
+
+
+    private void downloadAria(final String versionUrl) {
+        Log.d(TAG, "run: 下载开始");
+        try {
+            Aria.download(mContext)
+                    .load(versionUrl)
+                    .resetState()
+                    .setDownloadPath(Environment.getExternalStorageDirectory().getPath() + "/GoogleTranslate/f.txt")
+                    .start();
+        } catch (Exception e) {
+            Log.d(TAG, "run: " + e.getMessage());
+        }
+
+        Log.d(TAG, "run: 下载开始了");
+
+    }
+
 
 }

@@ -10,6 +10,7 @@ import android.os.IBinder;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.arialyy.aria.core.Aria;
 import com.example.liu.translateheadset.db.EaseUser;
 import com.example.liu.translateheadset.db.Myinfo;
 import com.example.liu.translateheadset.db.UserDao;
@@ -38,6 +39,7 @@ public class DemoApplication extends Application {
 		instance = this;
 		bleConfig();
 		ViseBle.getInstance().init(applicationContext);
+//		Aria.download(applicationContext).register();
 		// 初始化环信sdk
 		init(applicationContext);
 		bindService();
