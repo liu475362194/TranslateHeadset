@@ -32,13 +32,15 @@ public class SplashActivity extends BaseActivity {
         setContentView(R.layout.activity_splash);
         super.onCreate(arg0);
 
-        rootLayout = (RelativeLayout) findViewById(R.id.splash_root);
+        rootLayout = findViewById(R.id.splash_root);
         AlphaAnimation animation = new AlphaAnimation(0.3f, 1.0f);
         animation.setDuration(1500);
         rootLayout.startAnimation(animation);
 
         Intent intent = new Intent(this,MsgConnectionServices.class);
         startService(intent);
+
+        initPermission();
     }
 
 
@@ -48,13 +50,13 @@ public class SplashActivity extends BaseActivity {
     private void initPermission() {
         String permissions[] = {
                 Manifest.permission.RECORD_AUDIO,
-                Manifest.permission.ACCESS_NETWORK_STATE,
-                Manifest.permission.MODIFY_AUDIO_SETTINGS,
+//                Manifest.permission.ACCESS_NETWORK_STATE,
+//                Manifest.permission.MODIFY_AUDIO_SETTINGS,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE,
 //                Manifest.permission.WRITE_SETTINGS,
                 Manifest.permission.READ_PHONE_STATE,
-                Manifest.permission.ACCESS_WIFI_STATE,
-                Manifest.permission.CHANGE_WIFI_STATE
+//                Manifest.permission.ACCESS_WIFI_STATE,
+//                Manifest.permission.CHANGE_WIFI_STATE
         };
 
         ArrayList<String> toApplyList = new ArrayList<String>();
@@ -100,7 +102,7 @@ public class SplashActivity extends BaseActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        initPermission();
+
     }
 
     private void autoLogin() {

@@ -20,8 +20,21 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -72,10 +85,17 @@ public class GoogleApi {
 
     public void getTransResult(String query, String from, String to) {
         Map<String, String> params = buildParams(query, from, to);
-        String downloadUrl = HttpGet.getInstance().getUrlWithQueryString(TRANS_API_HOST, params);
+        final String downloadUrl = HttpGet.getInstance().getUrlWithQueryString(TRANS_API_HOST, params);
 //        download(downloadUrl,"GoogleTranslate.txt");
         downloadAria(downloadUrl);
 //        downAsynFile(downloadUrl);
+//        new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//                downloadHttpUrl(downloadUrl);
+//            }
+//        }).start();
+
     }
 
     private static Map<String, String> buildParams(String query, String from, String to) {
@@ -100,7 +120,7 @@ public class GoogleApi {
         long last = TimeStart2Stop.timeNeed(mContext, "GoogleApi", -1);
         //创建下载任务
         DownloadManager.Request request = new DownloadManager.Request(Uri.parse(versionUrl));
-        request.setAllowedOverRoaming(false);//漫游网络是否可以下载
+        request.setAllowedOverRoaming(true);//漫游网络是否可以下载
 
         //设置文件类型，可以在下载结束后自动打开该文件
         MimeTypeMap mimeTypeMap = MimeTypeMap.getSingleton();
@@ -163,10 +183,21 @@ public class GoogleApi {
 
 
     private void downAsynFile(String versionUrl) {
+        try {
+            // 设置SSLContext
+            SSLContext sslcontext = SSLContext.getInstance("TLS");
+            sslcontext.init(null, new TrustManager[]{myX509TrustManager}, null);
+        } catch (KeyManagementException e) {
+            e.printStackTrace();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+
+
         OkHttpClient mOkHttpClient = new OkHttpClient();
         String url = versionUrl;
         Log.d(TAG, "downAsynFile:url: " + url);
-        Request request = new Request.Builder().url(url).header("Range", "bytes=0-").build();
+        Request request = new Request.Builder().url(url).build();
         mOkHttpClient.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
@@ -177,20 +208,11 @@ public class GoogleApi {
                 InputStream inputStream = response.body().byteStream();
 
 
-                FileOutputStream fileOutputStream = null;
                 try {
-                    fileOutputStream = new FileOutputStream(new File(Environment.getExternalStorageDirectory() + "/GoogleTranslate/f.txt"));
-                    byte[] buffer = new byte[1024];
-                    int len = 0;
-                    while ((len = inputStream.read(buffer)) != -1) {
-                        fileOutputStream.write(buffer, 0, len);
-                    }
-                    fileOutputStream.flush();
+                    is2file(inputStream);
                 } catch (IOException e) {
-                    Log.i(TAG, "IOException");
                     e.printStackTrace();
                 }
-                Log.d(TAG, "文件下载成功");
 
 
 //                StringBuilder builder = new StringBuilder();
@@ -215,6 +237,22 @@ public class GoogleApi {
         });
     }
 
+    private static TrustManager myX509TrustManager = new X509TrustManager() {
+
+        @Override
+        public X509Certificate[] getAcceptedIssuers() {
+            return null;
+        }
+
+        @Override
+        public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+        }
+
+        @Override
+        public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+        }
+    };
+
 
     private void downloadAria(final String versionUrl) {
         Log.d(TAG, "run: 下载开始");
@@ -230,6 +268,52 @@ public class GoogleApi {
 
         Log.d(TAG, "run: 下载开始了");
 
+    }
+
+    private void downloadHttpUrl(String versionUrl) {
+        try {
+            URL url = new URL(versionUrl);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+
+            conn.setRequestMethod("POST");
+
+            //防止屏蔽程序抓取而返回403错误
+            conn.setRequestProperty("User-Agent", "Mozilla/4.0 (compatible; MSIE 5.0; Windows NT; DigExt)");
+
+            conn.setRequestProperty("Charset", "UTF-8");
+
+            conn.setDoInput(true);
+
+            conn.setConnectTimeout(5000);
+
+            conn.setReadTimeout(5000);
+
+            conn.connect();
+
+            InputStream inputStream = conn.getInputStream();
+
+            is2file(inputStream);
+
+            conn.disconnect();
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void is2file(InputStream inputStream) throws IOException {
+        FileOutputStream fileOutputStream = null;
+
+        fileOutputStream = new FileOutputStream(new File(Environment.getExternalStorageDirectory() + "/GoogleTranslate/f.txt"));
+        byte[] buffer = new byte[1024];
+        int len = 0;
+        while ((len = inputStream.read(buffer)) != -1) {
+            fileOutputStream.write(buffer, 0, len);
+        }
+        fileOutputStream.flush();
+
+        Log.d(TAG, "文件下载成功");
     }
 
 

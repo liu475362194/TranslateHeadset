@@ -14,6 +14,7 @@ import android.os.Environment;
 import android.os.IBinder;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -93,6 +94,8 @@ public class TranslateActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
         }
+
+
 
         @Override
         public void successSpeek(String string) {
@@ -212,6 +215,8 @@ public class TranslateActivity extends AppCompatActivity {
         }
     };
 
+    LocalBroadcastManager localBroadcastManager;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -223,6 +228,21 @@ public class TranslateActivity extends AppCompatActivity {
         Aria.download(this).register();
         TimeStart2Stop.timeNeed(this, "onCreate", last);
 //        registerReceiver(downloadReceiver, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
+
+        localBroadcastManager = LocalBroadcastManager.getInstance(this);
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction("com.example.broadcasttest.NOTIFY");
+        StartSpeakReceiver startSpeakReceiver = new StartSpeakReceiver();
+        localBroadcastManager.registerReceiver(startSpeakReceiver,intentFilter);
+    }
+
+    class StartSpeakReceiver extends BroadcastReceiver{
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+//            Log.d(TAG, "onReceive: " + recorder);
+            speekBinder.start("zh");
+        }
     }
 
     /**

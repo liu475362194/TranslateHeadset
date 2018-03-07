@@ -37,9 +37,10 @@ public class DemoApplication extends Application {
 		super.onCreate();
 		applicationContext = this;
 		instance = this;
+
+		//初始化BLE的SDK
 		bleConfig();
 		ViseBle.getInstance().init(applicationContext);
-//		Aria.download(applicationContext).register();
 		// 初始化环信sdk
 		init(applicationContext);
 		bindService();

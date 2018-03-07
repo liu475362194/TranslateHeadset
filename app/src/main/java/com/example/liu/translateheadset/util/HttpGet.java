@@ -175,7 +175,7 @@ public class HttpGet {
         }
 
         try {
-            return URLEncoder.encode(input, "utf-8");
+            return URLEncoder.encode(input, "GBK");
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }

@@ -1,11 +1,15 @@
 package com.example.liu.translateheadset.activity;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
@@ -24,6 +28,7 @@ import com.hyphenate.EMCallBack;
 import com.hyphenate.chat.EMClient;
 import com.hyphenate.exceptions.HyphenateException;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,7 +51,7 @@ public class LoginActivity extends BaseActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
+		initPermission();
 		// 如果登录成功过，直接进入主页面
 		if (EMClient.getInstance().isLoggedInBefore()) {
 			autoLogin = true;
@@ -183,6 +188,40 @@ public class LoginActivity extends BaseActivity {
 		}
     	
     }
+
+	/**
+	 * android 6.0 以上需要动态申请权限
+	 */
+	private void initPermission() {
+		String permissions[] = {
+				Manifest.permission.RECORD_AUDIO,
+//                Manifest.permission.ACCESS_NETWORK_STATE,
+//                Manifest.permission.MODIFY_AUDIO_SETTINGS,
+				Manifest.permission.WRITE_EXTERNAL_STORAGE,
+//                Manifest.permission.WRITE_SETTINGS,
+				Manifest.permission.READ_PHONE_STATE,
+//                Manifest.permission.ACCESS_WIFI_STATE,
+//                Manifest.permission.CHANGE_WIFI_STATE
+		};
+
+		ArrayList<String> toApplyList = new ArrayList<String>();
+
+		for (String perm : permissions) {
+			if (PackageManager.PERMISSION_GRANTED != ContextCompat.checkSelfPermission(this, perm)) {
+				toApplyList.add(perm);
+				//进入到这里代表没有权限.
+//                Toast.makeText(SplashActivity.this, "未获取到权限，请重新打开！", Toast.LENGTH_SHORT).show();
+//                finish();
+//                Toast.makeText(SplashActivity.this,"没权限",Toast.LENGTH_SHORT).show();
+			}
+		}
+		String tmpList[] = new String[toApplyList.size()];
+		if (!toApplyList.isEmpty()) {
+			ActivityCompat.requestPermissions(this, toApplyList.toArray(tmpList), 123);
+		} else {
+
+		}
+	}
 	
 	
 	/**
