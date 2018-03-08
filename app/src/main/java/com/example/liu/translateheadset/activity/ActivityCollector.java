@@ -3,6 +3,7 @@ package com.example.liu.translateheadset.activity;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.os.Build;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -66,6 +67,7 @@ public class ActivityCollector {
                 res = false;
             } else {
                 res = true;
+                Log.d("111", "isActivityExist: ");
             }
         }
 
