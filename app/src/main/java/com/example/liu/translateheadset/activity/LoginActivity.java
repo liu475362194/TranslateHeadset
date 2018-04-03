@@ -56,7 +56,7 @@ public class LoginActivity extends BaseActivity {
 		if (EMClient.getInstance().isLoggedInBefore()) {
 			autoLogin = true;
 			startActivity(new Intent(LoginActivity.this, MainTabActivity.class));
-
+			finish();
 			return;
 		}
 
@@ -162,7 +162,7 @@ public class LoginActivity extends BaseActivity {
 				runOnUiThread(new Runnable() {
 					public void run() {
 						pd.dismiss();
-						Toast.makeText(getApplicationContext(), getString(R.string.Login_failed) + message,
+						Toast.makeText(getApplicationContext(), getString(R.string.Login_failed) + "用户名或密码错误",
 								Toast.LENGTH_SHORT).show();
 					}
 				});

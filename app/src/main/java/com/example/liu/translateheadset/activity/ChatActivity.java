@@ -190,6 +190,7 @@ public class ChatActivity extends BaseActivity {
             addMes(message);
         }
         translateMes(false);
+        sizeHold20(messagesWithTranslate);
         adapter = new MessageAdapter(messagesWithTranslate, ChatActivity.this);
         listView.setAdapter(adapter);
         listView.setSelection(listView.getCount() - 1);
@@ -236,9 +237,7 @@ public class ChatActivity extends BaseActivity {
                     Log.d(TAG, "onResponse: " + messagesWithTranslate.get(finalI).getType());
                     if (isNow) {
                         getTtsBinder.speak(text);
-                        Log.d(TAG, "onResponse: start speak " + helper.responseTrans(response));
                     }
-                    Log.d(TAG, "onResponse: " + helper.responseTrans(response));
                 }
             });
         }
@@ -258,6 +257,15 @@ public class ChatActivity extends BaseActivity {
             mMessage.setType(1);
         }
         messagesWithTranslate.add(mMessage);
+    }
+
+    private void sizeHold20(List<Message> messagesWithTranslate){
+        if (messagesWithTranslate.size() > 20) {
+            for (int i = messagesWithTranslate.size()-1; i >= 20 ; i--) {
+                messagesWithTranslate.remove(i);
+            }
+
+        }
     }
 
     /**
@@ -393,21 +401,28 @@ public class ChatActivity extends BaseActivity {
 
         @Override
         public void onCmdMessageReceived(List<EMMessage> messages) {
+            Log.d(TAG, "onCmdMessageReceived: ");
             // 收到透传消息
         }
 
         @Override
-        public void onMessageReadAckReceived(List<EMMessage> messages) {
-            // 收到已读回执
+        public void onMessageRead(List<EMMessage> list) {
+
         }
 
         @Override
-        public void onMessageDeliveryAckReceived(List<EMMessage> message) {
-            // 收到已送达回执
+        public void onMessageDelivered(List<EMMessage> list) {
+
+        }
+
+        @Override
+        public void onMessageRecalled(List<EMMessage> list) {
+
         }
 
         @Override
         public void onMessageChanged(EMMessage message, Object change) {
+            Log.d(TAG, "onMessageChanged: ");
             // 消息状态变动
         }
     };
@@ -649,6 +664,7 @@ public class ChatActivity extends BaseActivity {
                         break;
                 }
                 btn_speak.setText(String.valueOf("识别"));
+                btn_speak.setClickable(true);
             }
 
         }
@@ -663,6 +679,7 @@ public class ChatActivity extends BaseActivity {
                     btn_speak.setText(String.valueOf(valume.getVolumepercent()));
                 }
             });
+            btn_speak.setClickable(false);
         }
     };
 

@@ -1,18 +1,14 @@
-package com.willblaschko.android.alexavoicelibrary.utility;
+package com.example.liu.translateheadset.view;
 
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.PixelFormat;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.FragmentActivity;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.ImageView;
 
-import com.willblaschko.android.alexavoicelibrary.AlexaApplication;
-import com.willblaschko.android.alexavoicelibrary.R;
+import com.example.liu.translateheadset.util.ScreenUtils;
 
 /**
  * 说明界面
@@ -62,7 +58,7 @@ public class TeachView {
     private WindowManager.LayoutParams setLayoutParams(){
         WindowManager.LayoutParams params = new WindowManager.LayoutParams();
         //设置显示的类型，TYPE_PHONE指的是来电话的时候会被覆盖，其他时候会在最前端，显示位置在stateBar下面。
-        params.type = WindowManager.LayoutParams.TYPE_PHONE;
+        params.type = WindowManager.LayoutParams.TYPE_APPLICATION_STARTING;
         //设置显示格式
         params.format = PixelFormat.RGBA_8888;
         //设置对其方式
@@ -75,6 +71,7 @@ public class TeachView {
 
     //应用教程窗口
     public void initStudyWindow(){
+
         final WindowManager windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
         final ImageView imageView = initStudyImg();
         windowManager.addView(imageView, setLayoutParams());

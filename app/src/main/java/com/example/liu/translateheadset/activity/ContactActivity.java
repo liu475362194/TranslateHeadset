@@ -7,6 +7,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -22,6 +23,7 @@ import com.example.liu.translateheadset.DemoApplication;
 import com.example.liu.translateheadset.R;
 import com.example.liu.translateheadset.db.EaseUser;
 import com.example.liu.translateheadset.util.EaseCommonUtils;
+import com.hyphenate.EMContactListener;
 import com.hyphenate.chat.EMClient;
 
 import java.util.ArrayList;
@@ -39,6 +41,7 @@ public class ContactActivity extends Fragment {
 	private Map<String, EaseUser> contactsMap;
 	private ContactAdapter adapter;
 
+	private static final String TAG = "ContactActivity";
 	public void onCreate(Bundle arg0) {
 		super.onCreate(arg0);
 //		setContentView(R.layout.activity_contact);
@@ -75,6 +78,7 @@ public class ContactActivity extends Fragment {
 //
 //		});
 
+
 	}
 
 	@Nullable
@@ -100,6 +104,47 @@ public class ContactActivity extends Fragment {
 			}
 
 		});
+
+		EMClient.getInstance().contactManager().setContactListener(new EMContactListener() {
+
+
+			@Override
+			public void onContactInvited(String username, String reason) {
+				//收到好友邀请
+				Log.d(TAG, "onContactInvited: 收到好友邀请");
+			}
+
+			@Override
+			public void onFriendRequestAccepted(String s) {
+				Log.d(TAG, "onFriendRequestAccepted: 好友请求被同意");
+			}
+
+			@Override
+			public void onFriendRequestDeclined(String s) {
+				Log.d(TAG, "onFriendRequestDeclined: 好友请求被拒绝");
+			}
+
+			@Override
+			public void onContactDeleted(String username) {
+				//被删除时回调此方法
+				Log.d(TAG, "onContactDeleted: 被删除时回调此方法");
+			}
+
+
+			@Override
+			public void onContactAdded(String username) {
+				//增加了联系人时回调此方法
+				getContactList();
+				listView.post(new Runnable() {
+					@Override
+					public void run() {
+						adapter.notifyDataSetChanged();
+					}
+				});
+				Log.d(TAG, "onContactAdded:增加了联系人时回调此方法 ");
+			}
+		});
+
 	}
 
 	/**

@@ -21,6 +21,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.liu.translateheadset.R;
 import com.example.liu.translateheadset.activity.ActivityCollector;
@@ -29,6 +30,7 @@ import com.example.liu.translateheadset.activity.BaseActivity;
 import com.example.liu.translateheadset.activity.MainActivity;
 import com.example.liu.translateheadset.services.BLEService;
 import com.example.liu.translateheadset.util.TimeStart2Stop;
+import com.vise.baseble.ViseBle;
 
 /**
  * Created by pzbz025 on 2017/12/27.
@@ -49,7 +51,7 @@ public class LayoutTitleBar extends RelativeLayout {
     @SuppressLint("ResourceAsColor")
     public LayoutTitleBar(final Context context, AttributeSet attrs) {
         super(context, attrs);
-        long last = TimeStart2Stop.timeNeed(context,"LayoutTitleBar",-1);
+        long last = TimeStart2Stop.timeNeed(context, "LayoutTitleBar", -1);
         LayoutInflater.from(context).inflate(R.layout.layout_title_bar, this, true);
         titleBarLeftBtn = (Button) findViewById(R.id.title_bar_left);
         titleBarRightBtn = findViewById(R.id.title_bar_right);
@@ -59,14 +61,21 @@ public class LayoutTitleBar extends RelativeLayout {
             @Override
             public void onClick(View view) {
 //                Log.d(TAG, "onClick: " + context.getClass().getSimpleName());
-                ((AppCompatActivity)context).finish();
+                ((AppCompatActivity) context).finish();
             }
         });
 
         titleBarRightBtn.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                context.startActivity(new Intent(context, BLEConnect2Activity.class));
+
+                if (!BLEService.isBleSuccess()) {
+                    context.startActivity(new Intent(context, BLEConnect2Activity.class));
+                } else {
+                    ViseBle.getInstance().disconnect();
+                    Toast.makeText(context,"连接已断开",Toast.LENGTH_SHORT).show();
+                    titleBarRightBtn.setImageDrawable(getResources().getDrawable(R.drawable.home_disconnected_pressed));
+                }
             }
         });
 
@@ -143,10 +152,13 @@ public class LayoutTitleBar extends RelativeLayout {
 //            } else {
             //设置右边图片icon 这里是二选一 要么只能是文字 要么只能是图片
             int rightButtonDrawable = typedArray.getResourceId(R.styleable.LayoutTitleBar_right_button_src, -1);
-            if (!BLEService.isBleSuccess())
+            if (!BLEService.isBleSuccess()) {
                 titleBarRightBtn.setImageDrawable(getResources().getDrawable(R.drawable.home_disconnected_pressed));
-            else
+                titleBarRightBtn.setClickable(true);
+            } else {
                 titleBarRightBtn.setImageDrawable(getResources().getDrawable(R.drawable.home_connect_pressed));
+//                titleBarRightBtn.setClickable(false);
+            }
             if (rightButtonDrawable != -1) {
                 titleBarRightBtn.setImageDrawable(getResources().getDrawable(rightButtonDrawable));
             }
@@ -154,7 +166,7 @@ public class LayoutTitleBar extends RelativeLayout {
             typedArray.recycle();
         }
 
-        TimeStart2Stop.timeNeed(context,"LayoutTitleBar",last);
+        TimeStart2Stop.timeNeed(context, "LayoutTitleBar", last);
     }
 
     class ConnectReceiver extends BroadcastReceiver {
@@ -162,6 +174,7 @@ public class LayoutTitleBar extends RelativeLayout {
         @Override
         public void onReceive(Context context, Intent intent) {
             titleBarRightBtn.setImageDrawable(getResources().getDrawable(R.drawable.home_connect_pressed));
+//            titleBarRightBtn.setClickable(false);
         }
     }
 
@@ -170,6 +183,7 @@ public class LayoutTitleBar extends RelativeLayout {
         @Override
         public void onReceive(Context context, Intent intent) {
             titleBarRightBtn.setImageDrawable(getResources().getDrawable(R.drawable.home_disconnected_pressed));
+            titleBarRightBtn.setClickable(true);
         }
     }
 

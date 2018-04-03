@@ -164,7 +164,7 @@ public class MainActivity extends BaseActivity implements OnClickListener {
         }
 
         @Override
-        public void onContactAgreed(final String username) {
+        public void onFriendRequestAccepted(final String username) {
             List<InviteMessage> msgs = inviteMessgeDao.getMessagesList();
             for (InviteMessage inviteMessage : msgs) {
                 if (inviteMessage.getFrom().equals(username)) {
@@ -187,14 +187,13 @@ public class MainActivity extends BaseActivity implements OnClickListener {
 
 
             });
-
         }
 
         @Override
-        public void onContactRefused(String username) {
-            // 参考同意，被邀请实现此功能,demo未实现
+        public void onFriendRequestDeclined(String username) {
             Log.d(username, username + "拒绝了你的好友请求");
         }
+
     }
 
     /**

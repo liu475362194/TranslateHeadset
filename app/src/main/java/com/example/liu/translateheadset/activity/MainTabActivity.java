@@ -4,6 +4,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
@@ -17,33 +18,32 @@ import com.example.liu.translateheadset.adapter.FragmentAdapter;
 import java.util.ArrayList;
 import java.util.List;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
 
 public class MainTabActivity extends AppCompatActivity {
 
-    @BindView(R.id.view_pager)
+//    @BindView(R.id.view_pager)
     ViewPager viewPager;
-    @BindView(R.id.tab_layout)
+//    @BindView(R.id.tab_layout)
     TabLayout tabLayout;
 
     private List<Fragment> list;
-    private FragmentAdapter adapter;
+    private FragmentPagerAdapter adapter;
 
-    private String [] titles = {"会话","通讯录","申请列表","添加好友"};
-    private int [] images = {R.drawable.message,R.drawable.friend_list,R.drawable.friend_new,R.drawable.add_friend};
+    private String [] titles = {"会话","通讯录","添加好友","申请列表"};
+    private int [] images = {R.drawable.message,R.drawable.friend_list,R.drawable.add_friend,R.drawable.friend_new};
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_tab);
-        ButterKnife.bind(this);
-
+//        ButterKnife.bind(this);
+        viewPager = findViewById(R.id.view_pager);
+        tabLayout = findViewById(R.id.tab_layout);
         list = new ArrayList<>();
         list.add(new ConversationActivity());
         list.add(new ContactActivity());
-        list.add(new NewFriendsMsgActivity());
+//        list.add(new NewFriendsMsgActivity());
         list.add(new AddContactActivity());
 
 //        for (int i = 0; i < 4; i++) {

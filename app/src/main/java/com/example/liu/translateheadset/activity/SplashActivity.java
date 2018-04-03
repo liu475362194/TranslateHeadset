@@ -14,6 +14,7 @@ import android.widget.Toast;
 import com.example.liu.translateheadset.R;
 import com.example.liu.translateheadset.TranslateActivity;
 import com.example.liu.translateheadset.services.MsgConnectionServices;
+import com.example.liu.translateheadset.util.TimeStart2Stop;
 import com.hyphenate.chat.EMClient;
 
 import java.util.ArrayList;
@@ -33,9 +34,9 @@ public class SplashActivity extends BaseActivity {
         super.onCreate(arg0);
 
         rootLayout = findViewById(R.id.splash_root);
-        AlphaAnimation animation = new AlphaAnimation(0.3f, 1.0f);
-        animation.setDuration(1500);
-        rootLayout.startAnimation(animation);
+//        AlphaAnimation animation = new AlphaAnimation(0.3f, 1.0f);
+//        animation.setDuration(1500);
+//        rootLayout.startAnimation(animation);
 
         Intent intent = new Intent(this,MsgConnectionServices.class);
         startService(intent);
@@ -92,9 +93,6 @@ public class SplashActivity extends BaseActivity {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 autoLogin();
             }
-// else {
-//
-//            }
         }
     }
 
@@ -106,6 +104,7 @@ public class SplashActivity extends BaseActivity {
     }
 
     private void autoLogin() {
+        long last = TimeStart2Stop.timeNeed(SplashActivity.this,"autoLogin",-1);
         new Thread(new Runnable() {
             public void run() {
                 if (EMClient.getInstance().isLoggedInBefore()) {
@@ -137,6 +136,8 @@ public class SplashActivity extends BaseActivity {
                 }
             }
         }).start();
+
+        TimeStart2Stop.timeNeed(SplashActivity.this,"autoLogin",last);
     }
 
 

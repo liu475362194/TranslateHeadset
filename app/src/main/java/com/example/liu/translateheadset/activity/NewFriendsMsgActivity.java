@@ -17,6 +17,7 @@ import com.example.liu.translateheadset.activity.adapter.NewFriendsMsgAdapter;
 import com.example.liu.translateheadset.db.InviteMessage;
 import com.example.liu.translateheadset.db.InviteMessgeDao;
 
+import java.util.Collections;
 import java.util.List;
 
 
@@ -72,6 +73,7 @@ public class NewFriendsMsgActivity extends Fragment {
 		listView = (ListView) view.findViewById(R.id.list);
 		InviteMessgeDao dao = new InviteMessgeDao(getActivity());
 		List<InviteMessage> msgs = dao.getMessagesList();
+		Collections.reverse(msgs);
 		NewFriendsMsgAdapter adapter = new NewFriendsMsgAdapter(getActivity(), 1, msgs);
 		listView.setAdapter(adapter);
 		dao.saveUnreadMessageCount(0);

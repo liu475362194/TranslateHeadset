@@ -1,7 +1,6 @@
 package com.example.liu.translateheadset;
 
 import android.Manifest;
-import android.app.DownloadManager;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -9,7 +8,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
+import android.os.Build;
 import android.os.Environment;
 import android.os.IBinder;
 import android.support.v4.app.ActivityCompat;
@@ -20,6 +19,7 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -31,6 +31,7 @@ import android.widget.Toast;
 import com.arialyy.annotations.Download;
 import com.arialyy.aria.core.Aria;
 import com.arialyy.aria.core.download.DownloadTask;
+import com.example.liu.translateheadset.activity.CameraActivity;
 import com.example.liu.translateheadset.adapter.TalkAdapter;
 import com.example.liu.translateheadset.translate.BaiduApi;
 import com.example.liu.translateheadset.gson.Error;
@@ -43,13 +44,13 @@ import com.example.liu.translateheadset.services.BaiDuSpeekService;
 import com.example.liu.translateheadset.services.BaiDuTTSService;
 import com.example.liu.translateheadset.services.BaiduWakeUpService;
 import com.example.liu.translateheadset.translate.GoogleApi;
+import com.example.liu.translateheadset.view.TeachView;
 import com.example.liu.translateheadset.util.TimeStart2Stop;
 import com.google.gson.Gson;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -234,6 +235,10 @@ public class TranslateActivity extends AppCompatActivity {
         intentFilter.addAction("com.example.broadcasttest.NOTIFY");
         StartSpeakReceiver startSpeakReceiver = new StartSpeakReceiver();
         localBroadcastManager.registerReceiver(startSpeakReceiver,intentFilter);
+
+//        if (Build.VERSION.SDK_INT <= 23){
+//            TeachView.getInstance(this).setImageId(R.drawable.local_translate).initStudyWindow();
+//        }
     }
 
     class StartSpeakReceiver extends BroadcastReceiver{
@@ -487,8 +492,29 @@ public class TranslateActivity extends AppCompatActivity {
         } else if (speak.getResult_type().equals("final_result")) {
             result = speak.getResults_recognition().get(0);
             editText.setText(result);
-
+            if (result.equals("打开相机")){
+                openCamera();
+            }
+            if (result.equals("拍照")){
+                speekBinder.takePhoto();
+            }
         }
+    }
+
+    private void openCamera(){
+        Intent intent = new Intent(this, CameraActivity.class);// 启动系统相机
+        startActivity(intent);
+    }
+
+    private void takePhoto(){
+                 try {
+                         // 按键操作命令 11.24勘误，之前错误的写成了"input keycode"
+                         String keyCommand = "input keyevent " + KeyEvent.KEYCODE_VOLUME_UP;
+                         // 调用Runtime模拟按键操作
+                         Runtime.getRuntime().exec(keyCommand);
+                     } catch (Exception e) {
+                         e.printStackTrace();
+                     }
     }
 
     /**
@@ -673,5 +699,8 @@ public class TranslateActivity extends AppCompatActivity {
     void taskFail(DownloadTask task) {
         Toast.makeText(this, "翻译失败", Toast.LENGTH_SHORT).show();
     }
+
+
+
 
 }

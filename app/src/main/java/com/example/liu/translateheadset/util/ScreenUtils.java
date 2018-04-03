@@ -1,7 +1,6 @@
-package com.willblaschko.android.alexavoicelibrary.utility;
+package com.example.liu.translateheadset.util;
 
 import android.content.Context;
-import android.graphics.Rect;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.WindowManager;

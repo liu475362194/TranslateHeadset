@@ -61,7 +61,7 @@ public class DemoApplication extends Application {
 		boolean success = initSDK(context, options);
 		if (success) {
 			// 设为调试模式，打成正式包时，最好设为false，以免消耗额外的资源
-			EMClient.getInstance().setDebugMode(false);
+			EMClient.getInstance().setDebugMode(true);
  			// 初始化数据库
 			initDbDao(context);
 		}
@@ -69,7 +69,7 @@ public class DemoApplication extends Application {
 
 	private void bleConfig(){
 		ViseBle.config()
-				.setScanTimeout(-1)//扫描超时时间，这里设置为永久扫描
+				.setScanTimeout(15 * 1000)//扫描超时时间，这里设置为永久扫描
 				.setConnectTimeout(10 * 1000)//连接超时时间
 				.setOperateTimeout(5 * 1000)//设置数据操作超时时间
 				.setConnectRetryCount(3)//设置连接失败重试次数
@@ -103,10 +103,10 @@ public class DemoApplication extends Application {
 
 		// 获取到EMChatOptions对象
 		EMOptions options = new EMOptions();
-		// 默认添加好友时，是不需要验证的，改成需要验证
+		// 默认添加好友时，是不需要验证的，false为改成需要验证
 		options.setAcceptInvitationAlways(true);
 		// 设置是否需要已读回执
-		options.setRequireAck(true);
+		options.setRequireAck(false);
 		// 设置是否需要已送达回执
 		options.setRequireDeliveryAck(false);
 		return options;

@@ -1,16 +1,19 @@
 package com.example.liu.translateheadset.services;
 
+import android.app.Instrumentation;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
+import android.view.KeyEvent;
 
 import com.baidu.speech.EventManager;
 import com.baidu.speech.EventManagerFactory;
 import com.baidu.speech.asr.SpeechConstant;
 import com.example.liu.translateheadset.TranslateActivity;
+import com.example.liu.translateheadset.activity.CameraActivity;
 
 import org.json.JSONObject;
 
@@ -47,6 +50,11 @@ public class BaiDuSpeekService extends Service implements com.baidu.speech.Event
             initSpeek(context);
             mSpeekResultListener = speekResultListener;
         }
+
+        public void takePhoto(){
+            CameraActivity.getInstance().takePhoto();
+        }
+
     }
 
     private void startSpeek(String string){

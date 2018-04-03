@@ -2,6 +2,7 @@ package com.example.liu.translateheadset.activity;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -14,7 +15,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.example.liu.translateheadset.DemoApplication;
 import com.example.liu.translateheadset.R;
+import com.hyphenate.EMCallBack;
 import com.hyphenate.chat.EMClient;
 
 
@@ -22,6 +25,8 @@ public class AddContactActivity extends Fragment {
 
  
 	private ProgressDialog progressDialog;
+
+
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -76,7 +81,59 @@ public class AddContactActivity extends Fragment {
 			}
 
 		});
+		Button btn_login_out = view.findViewById(R.id.btn_login_out);
+		btn_login_out.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				logout();
+			}
+		});
 	}
+
+	private void logout() {
+		final ProgressDialog pd = new ProgressDialog(getActivity());
+		String st = getResources().getString(R.string.Are_logged_out);
+		pd.setMessage(st);
+		pd.setCanceledOnTouchOutside(false);
+		pd.show();
+		DemoApplication.getInstance().logout(false, new EMCallBack() {
+
+			@Override
+			public void onSuccess() {
+				getActivity().runOnUiThread(new Runnable() {
+					public void run() {
+						pd.dismiss();
+						// 重新显示登陆页面
+						getActivity().finish();
+						startActivity(new Intent(getActivity(), LoginActivity.class));
+
+					}
+				});
+			}
+
+			@Override
+			public void onProgress(int progress, String status) {
+
+			}
+
+			@Override
+			public void onError(int code, String message) {
+				getActivity().runOnUiThread(new Runnable() {
+
+					@Override
+					public void run() {
+						// TODO Auto-generated method stub
+						pd.dismiss();
+						Toast.makeText(getActivity(), "unbind devicetokens failed", Toast.LENGTH_SHORT).show();
+
+
+					}
+				});
+			}
+		});
+	}
+
+
 
 	/**
 	 * 添加contact

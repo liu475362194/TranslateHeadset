@@ -96,17 +96,6 @@ public class MsgConnectionServices extends Service {
                         });
 
 
-
-
-
-
-
-
-
-
-
-
-
                     } else {
                         if (NetUtils.hasNetwork(MsgConnectionServices.this)) {
                             //连接不到聊天服务器

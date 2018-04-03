@@ -196,7 +196,7 @@ public class BLEService extends Service {
         @Override
         public void onConnectFailure(BleException exception) {
             Log.e(TAG, "onConnectFailure: ");
-//            addBroadcast("com.example.broadcasttest.CONNECT_FAILURE");
+            addBroadcast("com.example.broadcasttest.CONNECT_FAILURE");
 //            Toast.makeText(BLEService.this, "连接失败，请重试！", Toast.LENGTH_SHORT).show();
             isBLESuccess = false;
         }
@@ -249,39 +249,6 @@ public class BLEService extends Service {
         }, bluetoothGattChannel);
         deviceMirror.registerNotify(false);
     }
-//    {
-//        @Override
-//        public void onConnectSuccess(BluetoothGatt gatt, int status) {
-//            Log.e(TAG, "onSuccess: Connect");
-////            kProgressHUD.dismiss();
-//            Toast.makeText(BLEService.this,"连接成功", Toast.LENGTH_SHORT).show();
-//            addBroadcast("com.example.broadcasttest.CONNECTED");
-//
-//            Log.e(TAG, "onConnectSuccess: " + gatt.getDevice().getName());
-////            if (gatt.getDevice().getName().equals("MGA1000")) {
-////                gattCharacteristics = gatt.getService(serviceUUID).getCharacteristic(characteristicUUID);
-////                ViseBluetooth.getInstance().enableCharacteristicNotification(gattCharacteristics,iCharacteristicCallback,false);
-////            }
-//            isBLESuccess = true;
-//
-//        }
-//
-//        @Override
-//        public void onConnectFailure(BleException exception) {
-//            Log.e(TAG, "onConnectFailure: ");
-////            kProgressHUD.dismiss();
-//            addBroadcast("com.example.broadcasttest.CONNECT_FAILURE");
-//            Toast.makeText(BLEService.this,"连接失败，请重试！", Toast.LENGTH_SHORT).show();
-//            isBLESuccess = false;
-//        }
-//
-//        @Override
-//        public void onDisconnect() {
-//            Log.e(TAG, "onDisconnect: ");
-//            addBroadcast("com.example.broadcasttest.DISCONNECT");
-//            isBLESuccess = false;
-//        }
-//    };
 
 
     public static boolean isBleSuccess() {

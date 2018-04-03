@@ -8,21 +8,20 @@ import android.widget.TextView;
 
 import com.example.liu.translateheadset.R;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
-
 public class DialogActivity extends BaseActivity implements View.OnClickListener {
 
-    @BindView(R.id.tv_content)
+//    @BindView(R.id.tv_content)
     TextView tvContent;
-    @BindView(R.id.bt_relogin)
+//    @BindView(R.id.bt_relogin)
     Button btRelogin;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dialog);
-        ButterKnife.bind(this);
+//        ButterKnife.bind(this);
+        tvContent = findViewById(R.id.tv_content);
+        btRelogin = findViewById(R.id.bt_relogin);
         btRelogin.setOnClickListener(this);
         Intent intent = getIntent();
         String str = intent.getStringExtra("error_str");

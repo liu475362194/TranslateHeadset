@@ -78,7 +78,7 @@ public class ConversationActivity extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         Log.e(TAG, "onCreateView: ");
-        return inflater.inflate(R.layout.activity_conversation,container,false);
+        return inflater.inflate(R.layout.activity_conversation, container, false);
     }
 
     @Override
@@ -95,7 +95,7 @@ public class ConversationActivity extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 EMConversation conversation = adapter.getItem(position);
-                String username = conversation.getUserName();
+                String username = conversation.getLastMessage().getUserName();
                 if (username.equals(DemoApplication.getInstance().getCurrentUserName()))
                     Toast.makeText(getActivity(), st2, Toast.LENGTH_SHORT).show();
                 else {
@@ -112,7 +112,7 @@ public class ConversationActivity extends Fragment {
 
         @Override
         public void onMessageReceived(List<EMMessage> messages) {
-            long last = TimeStart2Stop.timeNeed(getActivity(),"onMessageReceived",-1);
+            Log.d(TAG, "onMessageReceived: ");
 
             getActivity().runOnUiThread(new Runnable() {
                 @Override
@@ -122,28 +122,33 @@ public class ConversationActivity extends Fragment {
             });
 
 
-            // 收到消息
-            TimeStart2Stop.timeNeed(getActivity(),"onMessageReceived",last);
         }
 
         @Override
         public void onCmdMessageReceived(List<EMMessage> messages) {
             // 收到透传消息
+            Log.d(TAG, "onCmdMessageReceived: ");
         }
 
         @Override
-        public void onMessageReadAckReceived(List<EMMessage> messages) {
-            // 收到已读回执
+        public void onMessageRead(List<EMMessage> list) {
+
         }
 
         @Override
-        public void onMessageDeliveryAckReceived(List<EMMessage> message) {
-            // 收到已送达回执
+        public void onMessageDelivered(List<EMMessage> list) {
+
+        }
+
+        @Override
+        public void onMessageRecalled(List<EMMessage> list) {
+
         }
 
         @Override
         public void onMessageChanged(EMMessage message, Object change) {
             // 消息状态变动
+            Log.d(TAG, "onMessageChanged: ");
         }
     };
 
@@ -154,7 +159,7 @@ public class ConversationActivity extends Fragment {
      * @return +
      */
     protected List<EMConversation> loadConversationList() {
-        long last = TimeStart2Stop.timeNeed(getActivity(),"loadConversationList",-1);
+        long last = TimeStart2Stop.timeNeed(getActivity(), "loadConversationList", -1);
         // 获取所有会话，包括陌生人
         Map<String, EMConversation> conversations = EMClient.getInstance().chatManager().getAllConversations();
         // 过滤掉messages size为0的conversation
@@ -181,7 +186,7 @@ public class ConversationActivity extends Fragment {
         for (Pair<Long, EMConversation> sortItem : sortList) {
             list.add(sortItem.second);
         }
-        TimeStart2Stop.timeNeed(getActivity(),"loadConversationList",last);
+        TimeStart2Stop.timeNeed(getActivity(), "loadConversationList", last);
         return list;
     }
 
@@ -263,7 +268,7 @@ public class ConversationActivity extends Fragment {
             // 获取与此用户/群组的会话
             EMConversation conversation = getItem(position);
             // 获取用户username或者群组groupid
-            String username = conversation.getUserName();
+            String username = conversation.getLastMessage().getUserName();
             holder.name.setText("与 " + username + " 的会话");
             if (conversation.getUnreadMsgCount() > 0) {
                 // 显示与此用户的消息未读数
@@ -275,7 +280,9 @@ public class ConversationActivity extends Fragment {
             if (conversation.getAllMsgCount() != 0) {
                 // 把最后一条消息的内容作为item的message内容
                 EMMessage lastMessage = conversation.getLastMessage();
-                holder.message.setText(lastMessage.getBody().toString());
+                String lMessage = lastMessage.getBody().toString();
+                String lMessages[] = lMessage.split(":");
+                holder.message.setText(lMessages[1]);
                 holder.time.setText(DateUtils.getTimestampString(new Date(lastMessage.getMsgTime())));
                 if (lastMessage.direct() == EMMessage.Direct.SEND && lastMessage.status() == EMMessage.Status.FAIL) {
                     holder.msgState.setVisibility(View.VISIBLE);
@@ -326,6 +333,7 @@ public class ConversationActivity extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        Log.d(TAG, "onResume: ");
         adapter.notifyDataSetChanged();
     }
 

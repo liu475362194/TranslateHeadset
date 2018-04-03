@@ -3,25 +3,19 @@ package com.example.liu.translateheadset.activity;
 import android.Manifest;
 import android.app.ActivityManager;
 import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -30,6 +24,7 @@ import com.example.liu.translateheadset.R;
 import com.example.liu.translateheadset.adapter.DeviceAdapter;
 import com.example.liu.translateheadset.services.BLEService;
 import com.example.liu.translateheadset.util.TimeStart2Stop;
+import com.example.liu.translateheadset.view.TeachView;
 import com.kaopiz.kprogresshud.KProgressHUD;
 import com.vise.baseble.model.BluetoothLeDevice;
 import com.vise.baseble.utils.BleUtil;
@@ -37,7 +32,7 @@ import com.vise.baseble.utils.BleUtil;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BLEConnect2Activity extends AppCompatActivity {
+public class BLEConnect2Activity extends BaseActivity {
 
     private static final String TAG = "BLEConnect2Activity";
 
@@ -89,7 +84,7 @@ public class BLEConnect2Activity extends AppCompatActivity {
 
 //        getSupportActionBar().setTitle("蓝牙连接");
 
-        listView = (ListView) findViewById(R.id.list);
+        listView = findViewById(R.id.list);
         adapter = new DeviceAdapter(this);
         listView.setAdapter(adapter);
 
@@ -112,6 +107,16 @@ public class BLEConnect2Activity extends AppCompatActivity {
         registerReceiver("com.example.broadcasttest.CONNECTING_GATT", connectingGattReceiver);
         registerReceiver("com.example.broadcasttest.DEVICE_FOUND", scanReceiver);
         registerReceiver("com.example.broadcasttest.CONNECT_FAILURE", connectFailReceiver);
+
+        if (Build.VERSION.SDK_INT <= 23) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+//                    TeachView.getInstance(BLEConnect2Activity.this).setImageId(R.drawable.ble_window).initStudyWindow();
+                }
+            });
+        }
+
     }
 
     /**
@@ -163,7 +168,7 @@ public class BLEConnect2Activity extends AppCompatActivity {
         public void onReceive(Context context, Intent intent) {
             kProgressHUD = new KProgressHUD(BLEConnect2Activity.this);
             kProgressHUD.setStyle(KProgressHUD.Style.SPIN_INDETERMINATE)
-                    .setDetailsLabel("正在连接BLE...")
+                    .setDetailsLabel("正在连接蓝牙设备...")
                     .setAnimationSpeed(2)
                     .show();
         }
@@ -177,7 +182,7 @@ public class BLEConnect2Activity extends AppCompatActivity {
             }
             kProgressHUD = new KProgressHUD(BLEConnect2Activity.this);
             kProgressHUD.setStyle(KProgressHUD.Style.SPIN_INDETERMINATE)
-                    .setDetailsLabel("正在连接GATT...")
+                    .setDetailsLabel("正在连接通讯服务...")
                     .setAnimationSpeed(2)
                     .show();
         }
