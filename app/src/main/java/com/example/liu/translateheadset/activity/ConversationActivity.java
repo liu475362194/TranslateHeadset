@@ -88,6 +88,8 @@ public class ConversationActivity extends Fragment {
 
         listView = (ListView) view.findViewById(R.id.listView);
         adapter = new EaseConversationAdapater(getActivity(), 1, conversationList);
+        TextView tv_toUsername = view.findViewById(R.id.title_bar_title);
+        tv_toUsername.setText(EMClient.getInstance().getCurrentUser());
         listView.setAdapter(adapter);
         final String st2 = getResources().getString(R.string.Cant_chat_with_yourself);
         listView.setOnItemClickListener(new OnItemClickListener() {

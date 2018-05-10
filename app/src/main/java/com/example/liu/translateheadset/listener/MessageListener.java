@@ -1,10 +1,20 @@
 package com.example.liu.translateheadset.listener;
 
+import android.media.AudioFormat;
+import android.media.AudioManager;
+import android.media.AudioTrack;
 import android.util.Log;
 
 import com.baidu.tts.client.SpeechError;
 import com.baidu.tts.client.SpeechSynthesizerListener;
 import com.example.liu.translateheadset.util.MainHandlerConstant;
+
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * SpeechSynthesizerListener 简单地实现，仅仅记录日志
@@ -13,6 +23,8 @@ import com.example.liu.translateheadset.util.MainHandlerConstant;
 
 public class MessageListener implements SpeechSynthesizerListener, MainHandlerConstant {
     private static final String TAG = "MessageListener";
+    ByteArrayOutputStream byteArrayOutputStream;
+    InputStream inputStream;
 
     /**
      * 播放开始，每句播放开始都会回调
@@ -21,6 +33,8 @@ public class MessageListener implements SpeechSynthesizerListener, MainHandlerCo
      */
     @Override
     public void onSynthesizeStart(String utteranceId) {
+        PlayThread();
+        byteArrayOutputStream = new ByteArrayOutputStream();
         sendMessage("准备开始合成,序列号:" + utteranceId);
     }
 
@@ -33,7 +47,15 @@ public class MessageListener implements SpeechSynthesizerListener, MainHandlerCo
      */
     @Override
     public void onSynthesizeDataArrived(String utteranceId, byte[] bytes, int progress) {
-        //  Log.i(TAG, "合成进度回调, progress：" + progress + ";序列号:" + utteranceId );
+
+
+        try {
+            byteArrayOutputStream.write(bytes);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        Log.i(TAG, "合成进度回调, progress：" + progress + ";bytes:" + bytes + " :progress "+ progress);
     }
 
     /**
@@ -43,6 +65,9 @@ public class MessageListener implements SpeechSynthesizerListener, MainHandlerCo
      */
     @Override
     public void onSynthesizeFinish(String utteranceId) {
+//        data = byteArrayOutputStream.toByteArray();
+        play(byteArrayOutputStream.toByteArray());
+        setChannel(false,true);
         sendMessage("合成结束回调, 序列号:" + utteranceId);
     }
 
@@ -99,5 +124,84 @@ public class MessageListener implements SpeechSynthesizerListener, MainHandlerCo
             Log.i(TAG, message);
         }
 
+    }
+
+    AudioTrack mAudioTrack;
+    // 采样率
+    private int mSampleRateInHz = 16000;
+    // 单声道
+    private int mChannelConfig = AudioFormat.CHANNEL_OUT_MONO;
+
+    public void PlayThread() {
+        int bufferSize = AudioTrack.getMinBufferSize(mSampleRateInHz, mChannelConfig, AudioFormat.ENCODING_PCM_16BIT);
+        mAudioTrack = new AudioTrack(
+                AudioManager.STREAM_MUSIC,
+                mSampleRateInHz,
+                mChannelConfig,
+                AudioFormat.ENCODING_PCM_16BIT,
+                bufferSize,
+                AudioTrack.MODE_STREAM);
+    }
+
+    private void play(final byte[] data){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                if (null != mAudioTrack)
+                    mAudioTrack.play();
+//                setChannel(false,true);
+                // 播放进度
+                int playIndex = 0;
+                // 是否缓冲完成
+                boolean isLoaded = false;
+                // 缓冲 + 播放
+                while (null != mAudioTrack && AudioTrack.PLAYSTATE_STOPPED != mAudioTrack.getPlayState()) {
+                    // 字符长度
+                    int len;
+//                if (-1 != (len = inputStream.read(buffer))) {
+//                    byteArrayOutputStream.write(buffer, 0, len);
+//                    data = byteArrayOutputStream.toByteArray();
+//                    Log.i(TAG, "run: 已缓冲 : " + data.length);
+//                } else {
+//                    // 缓冲完成
+//                    isLoaded = true;
+//                }
+
+                    if (AudioTrack.PLAYSTATE_PAUSED == mAudioTrack.getPlayState()) {
+                        // TODO 已经暂停
+                    }
+                    if (AudioTrack.PLAYSTATE_PLAYING == mAudioTrack.getPlayState()) {
+                        Log.i(TAG, "run: 开始从 " + playIndex + " 播放");
+                        playIndex += mAudioTrack.write(data, playIndex, data.length - playIndex);
+                        Log.i(TAG, "run: 播放到了 : " + playIndex);
+                        if (playIndex == data.length) {
+                            Log.i(TAG, "run: 播放完了");
+                            mAudioTrack.stop();
+                        }
+
+                        if (playIndex < 0) {
+                            Log.i(TAG, "run: 播放出错");
+                            mAudioTrack.stop();
+                            break;
+                        }
+                    }
+                }
+                Log.i(TAG, "run: play end");
+            }
+        }).start();
+
+    }
+
+    /**
+     * 设置左右声道是否可用
+     *
+     * @param left  左声道
+     * @param right 右声道
+     */
+    public void setChannel(boolean left, boolean right) {
+        if (null != mAudioTrack) {
+            mAudioTrack.setStereoVolume(left ? 1 : 0, right ? 1 : 0);
+            mAudioTrack.play();
+        }
     }
 }

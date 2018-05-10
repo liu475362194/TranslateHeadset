@@ -472,7 +472,7 @@ public class ChatActivity extends BaseActivity {
      */
     private void stopSCO() {
         if (mAudioManager.isBluetoothScoOn()) {
-//            mAudioManager.setMode(AudioManager.MODE_NORMAL);
+            mAudioManager.setMode(AudioManager.MODE_NORMAL);
             mAudioManager.setBluetoothScoOn(false);
             mAudioManager.stopBluetoothSco();
         }

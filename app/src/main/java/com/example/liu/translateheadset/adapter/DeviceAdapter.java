@@ -56,10 +56,8 @@ public class DeviceAdapter extends BaseAdapter {
         }
         if (deviceList != null && deviceList.get(position) != null && deviceList.get(position).getDevice() != null) {
             String deviceName = deviceList.get(position).getDevice().getName();
-            if (deviceName != null && !deviceName.isEmpty() && !deviceName.equals("Unknown device")) {
+            if (deviceName != null && !deviceName.isEmpty() && deviceName.equals("MGA1000")) {
                 viewHolder.deviceName.setText(deviceName);
-            } else {
-                viewHolder.deviceName.setText("Unknown device");
             }
             viewHolder.deviceAddress.setText(deviceList.get(position).getDevice().getAddress());
 

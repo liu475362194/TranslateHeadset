@@ -43,7 +43,7 @@ public class BaiDuTTSService extends Service {
     public class GetTts extends Binder {
         //开始朗读
         public void speak(String text) {
-            mSpeechSynthesizer.speak(text);
+            mSpeechSynthesizer.synthesize(text);
         }
         public void mInitTts(Context context){initTts(context);}
     }

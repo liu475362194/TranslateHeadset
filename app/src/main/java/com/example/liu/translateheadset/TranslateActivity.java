@@ -8,6 +8,9 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
+import android.media.AudioFormat;
+import android.media.AudioManager;
+import android.media.AudioTrack;
 import android.os.Build;
 import android.os.Environment;
 import android.os.IBinder;
@@ -97,10 +100,9 @@ public class TranslateActivity extends AppCompatActivity {
         }
 
 
-
         @Override
         public void successSpeek(String string) {
-
+            stopSCO();
             startTranslate();
             startTransZh.setClickable(true);
             startTransZh.setText(R.string.translate_zh);
@@ -167,7 +169,7 @@ public class TranslateActivity extends AppCompatActivity {
         public void SuccessWakeup(String string) {
             WakeUp wakeUp = gson.fromJson(string, WakeUp.class);
             if (wakeUp.getWord().equals("翻译中文")) {
-                speekBinder.start("zh");
+                startRecording();
             } else {
                 speekBinder.start("en");
             }
@@ -234,19 +236,21 @@ public class TranslateActivity extends AppCompatActivity {
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction("com.example.broadcasttest.NOTIFY");
         StartSpeakReceiver startSpeakReceiver = new StartSpeakReceiver();
-        localBroadcastManager.registerReceiver(startSpeakReceiver,intentFilter);
+        localBroadcastManager.registerReceiver(startSpeakReceiver, intentFilter);
+
+//        selectOutMono();
 
 //        if (Build.VERSION.SDK_INT <= 23){
 //            TeachView.getInstance(this).setImageId(R.drawable.local_translate).initStudyWindow();
 //        }
     }
 
-    class StartSpeakReceiver extends BroadcastReceiver{
+    class StartSpeakReceiver extends BroadcastReceiver {
 
         @Override
         public void onReceive(Context context, Intent intent) {
 //            Log.d(TAG, "onReceive: " + recorder);
-            speekBinder.start("zh");
+            startRecording();
         }
     }
 
@@ -355,7 +359,7 @@ public class TranslateActivity extends AppCompatActivity {
         final String toText = isEnglish(query);
         Log.d(TAG, "startTrans: " + query);
 
-        if (select.getText().equals("百度")){
+        if (select.getText().equals("百度")) {
             baiduApi.getTransResult(query, "auto", toText, new Callback() {
                 @Override
                 public void onFailure(Call call, IOException e) {
@@ -368,9 +372,9 @@ public class TranslateActivity extends AppCompatActivity {
                 }
             });
         } else {
-            if (toText.equals("en")){
+            if (toText.equals("en")) {
                 GoogleApi.getInstance().setContext(TranslateActivity.this).getTransResult(query, "zh-CN", "en");
-            }else{
+            } else {
                 GoogleApi.getInstance().setContext(TranslateActivity.this).getTransResult(query, "en", "zh-CN");
             }
         }
@@ -474,6 +478,7 @@ public class TranslateActivity extends AppCompatActivity {
             }
         });
         getTtsBinder.speak(translateResult);
+//        setChannel(false,true);
     }
 
     /**
@@ -492,29 +497,29 @@ public class TranslateActivity extends AppCompatActivity {
         } else if (speak.getResult_type().equals("final_result")) {
             result = speak.getResults_recognition().get(0);
             editText.setText(result);
-            if (result.equals("打开相机")){
+            if (result.equals("打开相机")) {
                 openCamera();
             }
-            if (result.equals("拍照")){
+            if (result.equals("拍照")) {
                 speekBinder.takePhoto();
             }
         }
     }
 
-    private void openCamera(){
+    private void openCamera() {
         Intent intent = new Intent(this, CameraActivity.class);// 启动系统相机
         startActivity(intent);
     }
 
-    private void takePhoto(){
-                 try {
-                         // 按键操作命令 11.24勘误，之前错误的写成了"input keycode"
-                         String keyCommand = "input keyevent " + KeyEvent.KEYCODE_VOLUME_UP;
-                         // 调用Runtime模拟按键操作
-                         Runtime.getRuntime().exec(keyCommand);
-                     } catch (Exception e) {
-                         e.printStackTrace();
-                     }
+    private void takePhoto() {
+        try {
+            // 按键操作命令 11.24勘误，之前错误的写成了"input keycode"
+            String keyCommand = "input keyevent " + KeyEvent.KEYCODE_VOLUME_UP;
+            // 调用Runtime模拟按键操作
+            Runtime.getRuntime().exec(keyCommand);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -627,7 +632,7 @@ public class TranslateActivity extends AppCompatActivity {
         startTransZh.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                speekBinder.start("zh");
+                startRecording();
             }
         });
         startTransEn.setOnClickListener(new View.OnClickListener() {
@@ -646,7 +651,7 @@ public class TranslateActivity extends AppCompatActivity {
         select.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (select.getText().equals("百度")){
+                if (select.getText().equals("百度")) {
                     select.setText("谷歌");
                 } else {
                     select.setText("百度");
@@ -660,7 +665,7 @@ public class TranslateActivity extends AppCompatActivity {
 //        Toast.makeText(this, "下载完成", Toast.LENGTH_SHORT).show();
 
         String content = getGoogleContent();
-        String [] splitContent = content.split("\"");
+        String[] splitContent = content.split("\"");
 //        for (String str : splitContent){
 //            Log.d(TAG, "taskComplete: 分割文本： " + str);
 //        }
@@ -674,20 +679,18 @@ public class TranslateActivity extends AppCompatActivity {
             InputStream instream = new FileInputStream(new File(Environment.getExternalStorageDirectory() + "/GoogleTranslate/f.txt"));
             if (instream != null) {
                 InputStreamReader inputreader
-                        =new InputStreamReader(instream, "UTF-8");
+                        = new InputStreamReader(instream, "UTF-8");
                 BufferedReader buffreader = new BufferedReader(inputreader);
-                String line="";
+                String line = "";
                 //分行读取
-                while (( line = buffreader.readLine()) != null) {
+                while ((line = buffreader.readLine()) != null) {
                     content += line + "\n";
                 }
                 instream.close();       //关闭输入流
             }
-        }
-        catch (java.io.FileNotFoundException e) {
+        } catch (java.io.FileNotFoundException e) {
             Log.d("TestFile", "The File doesn't not exist.");
-        }
-        catch (IOException e)  {
+        } catch (IOException e) {
             Log.d("TestFile", e.getMessage());
         }
 
@@ -701,6 +704,128 @@ public class TranslateActivity extends AppCompatActivity {
     }
 
 
+    private AudioManager mAudioManager;
 
+    /**
+     * 打开SCO端口，使用耳机端录音
+     */
+    public void startRecording() {
+        mAudioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
+//        mAudioManager.setMode(AudioManager.MODE_IN_CALL);
+        //蓝牙录音的关键，启动SCO连接，耳机话筒才起作用
+        Log.e(TAG, "startRecording 启动SCO连接");
+//        isStartVoice = true;
+        mAudioManager.startBluetoothSco();
+        //蓝牙SCO连接建立需要时间，连接建立后会发出ACTION_SCO_AUDIO_STATE_CHANGED消息，通过接收该消息而进入后续逻辑。
+        //也有可能此时SCO已经建立，则不会收到上述消息，可以startBluetoothSco()前先stopBluetoothSco()
+        registerReceiver(new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                int state = intent.getIntExtra(AudioManager.EXTRA_SCO_AUDIO_STATE, -1);
+                Log.e(TAG, "state = " + state);
+                if (AudioManager.SCO_AUDIO_STATE_CONNECTED == state) {
+                    mAudioManager.setBluetoothScoOn(true);  //打开SCO
+                    mAudioManager.adjustVolume(AudioManager.ADJUST_RAISE, 0);
+                    Log.e(TAG, "isBluetoothScoOn = " + mAudioManager.isBluetoothScoOn());
+                    if (mAudioManager.isBluetoothScoOn()) {
+
+                        //  recorder.start();//开始录音
+//                        startSCOListening();
+
+                        speekBinder.start("zh");
+                    }
+
+                    unregisterReceiver(this);  //别遗漏
+                } else {//等待一秒后再尝试启动SCO
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                Thread.sleep(1000);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                            mAudioManager.startBluetoothSco();
+                        }
+                    }).start();
+
+                }
+            }
+        }, new IntentFilter(AudioManager.ACTION_SCO_AUDIO_STATE_CHANGED));
+    }
+
+    /**
+     * 切换回A2DP
+     * 不切换回来会出现耳机无声音出现。
+     */
+    private void setBluetoothA2dpOn(){
+            if (!mAudioManager.isBluetoothA2dpOn())
+                mAudioManager.setBluetoothA2dpOn(true); // 如果A2DP没建立，则建立A2DP连接
+            mAudioManager.stopBluetoothSco();// 如果SCO没有断开，由于SCO优先级高于A2DP，A2DP可能无声音
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    mAudioManager.setStreamSolo(AudioManager.STREAM_MUSIC, true);
+                    // 让声音路由到蓝牙A2DP。此方法虽已弃用，但就它比较直接、好用。
+                    mAudioManager.setRouting(AudioManager.STREAM_MUSIC,
+                            AudioManager.ROUTE_BLUETOOTH_A2DP,
+                            AudioManager.ROUTE_BLUETOOTH);
+                }
+            }).start();
+
+    }
+
+
+    /**
+     * 关闭SCO端口
+     */
+    private void stopSCO() {
+        if (mAudioManager.isBluetoothScoOn()) {
+//            mAudioManager.setMode(AudioManager.MODE_NORMAL);
+            mAudioManager.setBluetoothScoOn(false);
+            mAudioManager.stopBluetoothSco();
+//            mAudioManager.setMode(AudioManager.MODE_NORMAL);
+//            mAudioManager = null;
+            Log.e(TAG, "stopSCO: startListening: recorder.stop()");
+        }
+
+        setBluetoothA2dpOn();
+
+    }
+
+
+    //------------------------------------------------------设置单声道播放------------------------------------------------------
+//    AudioTrack mAudioTrack;
+//    private void selectOutMono(){
+//        // 采样率
+//        int mSampleRateInHz = 16000;
+//        // 单声道
+//        int mChannelConfig = AudioFormat.CHANNEL_OUT_MONO;
+//
+//
+//
+//        int bufferSize = AudioTrack.getMinBufferSize(mSampleRateInHz, mChannelConfig, AudioFormat.ENCODING_PCM_16BIT);
+//        mAudioTrack = new AudioTrack(
+//                AudioManager.STREAM_MUSIC,
+//                mSampleRateInHz,
+//                mChannelConfig,
+//                AudioFormat.ENCODING_PCM_16BIT,
+//                bufferSize,
+//                AudioTrack.MODE_STREAM);
+//
+//    }
+//
+//    /**
+//     * 设置左右声道是否可用
+//     *
+//     * @param left  左声道
+//     * @param right 右声道
+//     */
+//    public void setChannel(boolean left, boolean right) {
+//        if (null != mAudioTrack) {
+//            mAudioTrack.setStereoVolume(left ? 1 : 0, right ? 1 : 0);
+//            mAudioTrack.play();
+//        }
+//    }
 
 }

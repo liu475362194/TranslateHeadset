@@ -136,8 +136,8 @@
     <string name="Introduction">简介</string>
     <string name="To_join_the_chat">加入群聊</string>
     <string name="login">登录</string>
-    <string name="user_name">用户名</string>
-    <string name="password">密码</string>
+    <string name="user_name">用户名(请输入至少3位英文/数字)</string>
+    <string name="password">密码(请输入至少3位密码)</string>
     <string name="register">注册</string>
     <string name="confirmpassword">确认密码</string>
     <string name="downwaiting">正在下载文件请稍后</string>

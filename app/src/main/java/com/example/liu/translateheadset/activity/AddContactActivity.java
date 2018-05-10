@@ -2,10 +2,12 @@ package com.example.liu.translateheadset.activity;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -85,7 +87,22 @@ public class AddContactActivity extends Fragment {
 		btn_login_out.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				logout();
+				final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+				builder.setTitle("提示");
+				builder.setMessage("是否确定退出登录？");
+				builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialogInterface, int i) {
+						logout();
+					}
+				});
+				builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialogInterface, int i) {
+
+					}
+				});
+				builder.show();
 			}
 		});
 	}

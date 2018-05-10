@@ -26,6 +26,7 @@ import com.example.liu.translateheadset.services.BLEService;
 import com.example.liu.translateheadset.util.TimeStart2Stop;
 import com.example.liu.translateheadset.view.TeachView;
 import com.kaopiz.kprogresshud.KProgressHUD;
+import com.vise.baseble.ViseBle;
 import com.vise.baseble.model.BluetoothLeDevice;
 import com.vise.baseble.utils.BleUtil;
 
@@ -177,14 +178,14 @@ public class BLEConnect2Activity extends BaseActivity {
     class ConnectingGattReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (kProgressHUD.isShowing()) {
-                kProgressHUD.dismiss();
-            }
-            kProgressHUD = new KProgressHUD(BLEConnect2Activity.this);
-            kProgressHUD.setStyle(KProgressHUD.Style.SPIN_INDETERMINATE)
-                    .setDetailsLabel("正在连接通讯服务...")
-                    .setAnimationSpeed(2)
-                    .show();
+//            if (kProgressHUD.isShowing()) {
+//                kProgressHUD.dismiss();
+//            }
+//            kProgressHUD = new KProgressHUD(BLEConnect2Activity.this);
+//            kProgressHUD.setStyle(KProgressHUD.Style.SPIN_INDETERMINATE)
+//                    .setDetailsLabel("正在连接通讯服务...")
+//                    .setAnimationSpeed(2)
+//                    .show();
         }
     }
 
@@ -252,6 +253,8 @@ public class BLEConnect2Activity extends BaseActivity {
             }
         } else {
             BleUtil.enableBluetooth(this, 1);
+//            ViseBle.getInstance().getBluetoothAdapter().enable();
+//            bleBinder.startScan();
         }
 
         TimeStart2Stop.timeNeed(BLEConnect2Activity.this, "checkBluetoothPermission", last);

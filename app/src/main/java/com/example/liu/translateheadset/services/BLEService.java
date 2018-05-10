@@ -122,7 +122,6 @@ public class BLEService extends Service {
     });
 
     public void BLEfind() {
-        long last = timeNeed(BLEService.this, "BLEfind", -1);
         if (bluetoothLeDeviceStore != null) {
             bluetoothLeDeviceStore.clear();
         }
@@ -131,19 +130,15 @@ public class BLEService extends Service {
             adapter.setDeviceList(bluetoothLeDeviceList);
         }
         ViseBle.getInstance().startScan(periodScanCallback);
-        timeNeed(BLEService.this, "BLEfind", last);
     }
 
 
     //BLE连接指定地址的设备
     public void BLEConnect(String mac) {
-        long last = timeNeed(BLEService.this, "BLEConnect", -1);
 
         stopScan();
         addBroadcast("com.example.broadcasttest.CONNECTING");
         ViseBle.getInstance().connectByMac(mac, iConnectCallback);
-
-        timeNeed(BLEService.this, "BLEConnect", last);
     }
 
     private Toast showToash(String string) {

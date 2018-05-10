@@ -25,10 +25,12 @@ import com.example.liu.translateheadset.db.EaseUser;
 import com.example.liu.translateheadset.util.EaseCommonUtils;
 import com.hyphenate.EMContactListener;
 import com.hyphenate.chat.EMClient;
+import com.hyphenate.exceptions.HyphenateException;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -134,6 +136,7 @@ public class ContactActivity extends Fragment {
 			@Override
 			public void onContactAdded(String username) {
 				//增加了联系人时回调此方法
+				getFriends();
 				getContactList();
 				listView.post(new Runnable() {
 					@Override
@@ -193,6 +196,26 @@ public class ContactActivity extends Fragment {
 
 			}
 		});
+
+	}
+
+	private  void  getFriends(){
+		try {
+			List<String> usernames = EMClient.getInstance().contactManager().getAllContactsFromServer();
+			Map<String ,EaseUser>users=new HashMap<String ,EaseUser>();
+			for(String username:usernames){
+				EaseUser user=new EaseUser(username);
+				users.put(username, user);
+
+
+			}
+
+			DemoApplication.getInstance().setContactList(users);
+
+
+		} catch (HyphenateException e) {
+			e.printStackTrace();
+		}
 
 	}
 
