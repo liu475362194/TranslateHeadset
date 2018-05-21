@@ -1,48 +1,43 @@
 package com.example.liu.translateheadset.view;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.TypedArray;
 import android.graphics.Color;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.clj.fastble.BleManager;
+import com.clj.fastble.data.BleDevice;
+import com.example.liu.translateheadset.DemoApplication;
 import com.example.liu.translateheadset.R;
-import com.example.liu.translateheadset.activity.ActivityCollector;
 import com.example.liu.translateheadset.activity.BLEConnect2Activity;
-import com.example.liu.translateheadset.activity.BaseActivity;
-import com.example.liu.translateheadset.activity.MainActivity;
-import com.example.liu.translateheadset.services.BLEService;
 import com.example.liu.translateheadset.util.TimeStart2Stop;
-import com.vise.baseble.ViseBle;
 
 /**
  * Created by pzbz025 on 2017/12/27.
  */
 
-public class LayoutTitleBar extends RelativeLayout {
+public class LayoutTitleBar extends RelativeLayout{
     private Button titleBarLeftBtn;
     private ImageView titleBarRightBtn;
     private TextView titleBarTitle;
     private LocalBroadcastManager localBroadcastManager;
     private IntentFilter intentFilter;
     private static final String TAG = "LayoutTitleBar";
+
 
     public LayoutTitleBar(Context context) {
         super(context);
@@ -69,10 +64,10 @@ public class LayoutTitleBar extends RelativeLayout {
             @Override
             public void onClick(View view) {
 
-                if (!BLEService.isBleSuccess()) {
+                if (BleManager.getInstance().getAllConnectedDevice().size()<=0) {
                     context.startActivity(new Intent(context, BLEConnect2Activity.class));
                 } else {
-                    ViseBle.getInstance().disconnect();
+                    BleManager.getInstance().disconnectAllDevice();
                     Toast.makeText(context,"连接已断开",Toast.LENGTH_SHORT).show();
                     titleBarRightBtn.setImageDrawable(getResources().getDrawable(R.drawable.home_disconnected_pressed));
                 }
@@ -152,7 +147,9 @@ public class LayoutTitleBar extends RelativeLayout {
 //            } else {
             //设置右边图片icon 这里是二选一 要么只能是文字 要么只能是图片
             int rightButtonDrawable = typedArray.getResourceId(R.styleable.LayoutTitleBar_right_button_src, -1);
-            if (!BLEService.isBleSuccess()) {
+            BleDevice bleDevice = DemoApplication.getInstance().getBleDevice();
+
+            if (bleDevice == null && !BleManager.getInstance().isConnected(bleDevice)) {
                 titleBarRightBtn.setImageDrawable(getResources().getDrawable(R.drawable.home_disconnected_pressed));
                 titleBarRightBtn.setClickable(true);
             } else {
@@ -168,6 +165,8 @@ public class LayoutTitleBar extends RelativeLayout {
 
         TimeStart2Stop.timeNeed(context, "LayoutTitleBar", last);
     }
+
+
 
     class ConnectReceiver extends BroadcastReceiver {
 
@@ -204,5 +203,9 @@ public class LayoutTitleBar extends RelativeLayout {
 
     public TextView getTitleBarTitle() {
         return titleBarTitle;
+    }
+
+    public void setTitleBarTitle(String title) {
+        titleBarTitle.setText(title);
     }
 }

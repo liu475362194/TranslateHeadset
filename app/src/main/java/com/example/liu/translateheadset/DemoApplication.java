@@ -11,14 +11,14 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.arialyy.aria.core.Aria;
+import com.clj.fastble.BleManager;
+import com.clj.fastble.data.BleDevice;
 import com.example.liu.translateheadset.db.EaseUser;
 import com.example.liu.translateheadset.db.Myinfo;
 import com.example.liu.translateheadset.db.UserDao;
-import com.example.liu.translateheadset.services.BLEService;
 import com.hyphenate.EMCallBack;
 import com.hyphenate.chat.EMClient;
 import com.hyphenate.chat.EMOptions;
-import com.vise.baseble.ViseBle;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -32,18 +32,26 @@ public class DemoApplication extends Application {
 	private String username = "";
 	private Map<String, EaseUser> contactList;
 
+	public BleDevice getBleDevice() {
+		return bleDevice;
+	}
+
+	public void setBleDevice(BleDevice bleDevice) {
+		this.bleDevice = bleDevice;
+	}
+
+	private BleDevice bleDevice;
+
 	@Override
 	public void onCreate() {
 		super.onCreate();
 		applicationContext = this;
 		instance = this;
 
-		//初始化BLE的SDK
-		bleConfig();
-		ViseBle.getInstance().init(applicationContext);
 		// 初始化环信sdk
 		init(applicationContext);
-		bindService();
+
+		BleManager.getInstance().init(this);
 	}
 
 	public static DemoApplication getInstance() {
@@ -65,18 +73,6 @@ public class DemoApplication extends Application {
  			// 初始化数据库
 			initDbDao(context);
 		}
-	}
-
-	private void bleConfig(){
-		ViseBle.config()
-				.setScanTimeout(15 * 1000)//扫描超时时间，这里设置为永久扫描
-				.setConnectTimeout(10 * 1000)//连接超时时间
-				.setOperateTimeout(5 * 1000)//设置数据操作超时时间
-				.setConnectRetryCount(3)//设置连接失败重试次数
-				.setConnectRetryInterval(1000)//设置连接失败重试间隔时间
-				.setOperateRetryCount(3)//设置数据操作失败重试次数
-				.setOperateRetryInterval(1000)//设置数据操作失败重试间隔时间
-				.setMaxConnectCount(3);//设置最大连接设备数量
 	}
 
 	private void initDbDao(Context context) {
@@ -184,32 +180,6 @@ public class DemoApplication extends Application {
 		}
 		return contactList;
 
-	}
-
-	private static BLEService.BLEBinder bleBinder;
-	private ServiceConnection connection = new ServiceConnection() {
-		@Override
-		public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-			bleBinder = (BLEService.BLEBinder) iBinder;
-//			checkBluetoothPermission();
-		}
-
-		@Override
-		public void onServiceDisconnected(ComponentName componentName) {
-
-		}
-	};
-
-	private void bindService() {
-//		Log.d(TAG, "bindService: ");
-		Intent startIntent = new Intent(this,BLEService.class);
-		startService(startIntent);
-		Intent bindIntent = new Intent(this, BLEService.class);
-		bindService(bindIntent, connection, BIND_AUTO_CREATE);
-	}
-
-	public static BLEService.BLEBinder getBleBinder(){
-		return bleBinder;
 	}
 
 	/**

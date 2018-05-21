@@ -43,6 +43,15 @@ public class BaiduWakeUpService extends Service implements EventListener {
             mWakeUpListener = wakeUpListener;
             start();
         }
+
+        public void startWakeUp(){
+            start();
+        }
+
+        public void stopWakeUp(){
+            stop();
+        }
+
     }
 
     public BaiduWakeUpService() {
@@ -68,6 +77,12 @@ public class BaiduWakeUpService extends Service implements EventListener {
         json = new JSONObject(params).toString();
         wakeUp.send(SpeechConstant.WAKEUP_START, json, null, 0, 0);
     }
+
+    private void stop(){
+        wakeUp.send(SpeechConstant.WAKEUP_STOP, "{}", null, 0, 0);
+    }
+
+
 
     @Override
     public void onDestroy() {

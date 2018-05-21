@@ -15,6 +15,7 @@ import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewStub;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -24,6 +25,7 @@ import com.example.liu.translateheadset.TranslateActivity;
 import com.example.liu.translateheadset.db.DemoDBManager;
 import com.example.liu.translateheadset.db.EaseUser;
 import com.example.liu.translateheadset.util.EaseCommonUtils;
+import com.example.liu.translateheadset.view.LayoutTitleBar;
 import com.hyphenate.EMCallBack;
 import com.hyphenate.chat.EMClient;
 import com.hyphenate.exceptions.HyphenateException;
@@ -41,6 +43,7 @@ public class LoginActivity extends BaseActivity {
 	public static final int REQUEST_CODE_SETNICK = 1;
 	private EditText usernameEditText;
 	private EditText passwordEditText;
+	private ViewStub viewStub;
 
 	private boolean progressShow;
 	private boolean autoLogin = false;
@@ -48,40 +51,53 @@ public class LoginActivity extends BaseActivity {
 	private String currentUsername;
 	private String currentPassword;
 
+	//此处更改是否启用登陆功能。
+	private boolean isCanChat = false;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		initPermission();
-		// 如果登录成功过，直接进入主页面
-		if (EMClient.getInstance().isLoggedInBefore()) {
-			autoLogin = true;
-			startActivity(new Intent(LoginActivity.this, MainTabActivity.class));
-			finish();
-			return;
-		}
+
 
 		setContentView(R.layout.activity_login);
 
-		usernameEditText = (EditText) findViewById(R.id.username);
-		passwordEditText = (EditText) findViewById(R.id.password);
 
-		// 如果用户名改变，清空密码
-		usernameEditText.addTextChangedListener(new TextWatcher() {
-			@Override
-			public void onTextChanged(CharSequence s, int start, int before, int count) {
-				passwordEditText.setText(null);
+		if (isCanChat) {
+			// 如果登录成功过，直接进入主页面
+			if (EMClient.getInstance().isLoggedInBefore()) {
+				autoLogin = true;
+				startActivity(new Intent(LoginActivity.this, MainTabActivity.class));
+				finish();
+				return;
 			}
+			viewStub = findViewById(R.id.view_stub);
+			viewStub.inflate();
 
-			@Override
-			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+			usernameEditText = (EditText) findViewById(R.id.username);
+			passwordEditText = (EditText) findViewById(R.id.password);
 
-			}
+			// 如果用户名改变，清空密码
+			usernameEditText.addTextChangedListener(new TextWatcher() {
+				@Override
+				public void onTextChanged(CharSequence s, int start, int before, int count) {
+					passwordEditText.setText(null);
+				}
 
-			@Override
-			public void afterTextChanged(Editable s) {
+				@Override
+				public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
-			}
-		});
+				}
+
+				@Override
+				public void afterTextChanged(Editable s) {
+
+				}
+			});
+		} else {
+			LayoutTitleBar layoutTitleBar = findViewById(R.id.title_bar);
+			layoutTitleBar.setTitleBarTitle("翻译");
+		}
 		 
 	}
 
@@ -234,7 +250,10 @@ public class LoginActivity extends BaseActivity {
 	}
 
 	public void local(View view){
-		startActivity(new Intent(this, TranslateActivity.class));
+		Intent intent = new Intent(this, TranslateActivity.class);
+		intent.putExtra("left",true);
+		intent.putExtra("right",true);
+		startActivity(intent);
 	}
 
 	@Override
@@ -243,5 +262,12 @@ public class LoginActivity extends BaseActivity {
 		if (autoLogin) {
 			return;
 		}
+	}
+
+	public void local1in1out(View view) {
+		Intent intent = new Intent(this, TranslateActivity.class);
+		intent.putExtra("left",false);
+		intent.putExtra("right",true);
+		startActivity(intent);
 	}
 }

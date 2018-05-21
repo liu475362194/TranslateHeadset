@@ -1,5 +1,7 @@
 package com.example.liu.translateheadset.listener;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioTrack;
@@ -7,6 +9,7 @@ import android.util.Log;
 
 import com.baidu.tts.client.SpeechError;
 import com.baidu.tts.client.SpeechSynthesizerListener;
+import com.example.liu.translateheadset.DemoApplication;
 import com.example.liu.translateheadset.util.MainHandlerConstant;
 
 import java.io.BufferedInputStream;
@@ -25,6 +28,7 @@ public class MessageListener implements SpeechSynthesizerListener, MainHandlerCo
     private static final String TAG = "MessageListener";
     ByteArrayOutputStream byteArrayOutputStream;
     InputStream inputStream;
+
 
     /**
      * 播放开始，每句播放开始都会回调
@@ -67,7 +71,10 @@ public class MessageListener implements SpeechSynthesizerListener, MainHandlerCo
     public void onSynthesizeFinish(String utteranceId) {
 //        data = byteArrayOutputStream.toByteArray();
         play(byteArrayOutputStream.toByteArray());
-        setChannel(false,true);
+        SharedPreferences sp = DemoApplication.getInstance().getSharedPreferences("channel", Context.MODE_PRIVATE);
+        boolean left = sp.getBoolean("left",true);
+        boolean right = sp.getBoolean("right",true);
+        setChannel(left,right);
         sendMessage("合成结束回调, 序列号:" + utteranceId);
     }
 

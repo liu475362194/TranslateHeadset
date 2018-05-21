@@ -7,21 +7,21 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
+import com.clj.fastble.data.BleDevice;
 import com.example.liu.translateheadset.R;
-import com.vise.baseble.model.BluetoothLeDevice;
 
 import java.util.List;
 
 public class DeviceAdapter extends BaseAdapter {
 
     private Context context;
-    private List<BluetoothLeDevice> deviceList;
+    private List<BleDevice> deviceList;
 
     public DeviceAdapter(Context context) {
         this.context = context;
     }
 
-    public DeviceAdapter setDeviceList(List<BluetoothLeDevice> deviceList) {
+    public DeviceAdapter setDeviceList(List<BleDevice> deviceList) {
         this.deviceList = deviceList;
         notifyDataSetChanged();
         return this;
@@ -55,11 +55,11 @@ public class DeviceAdapter extends BaseAdapter {
             viewHolder = (ViewHolder) convertView.getTag();
         }
         if (deviceList != null && deviceList.get(position) != null && deviceList.get(position).getDevice() != null) {
-            String deviceName = deviceList.get(position).getDevice().getName();
-            if (deviceName != null && !deviceName.isEmpty() && deviceName.equals("MGA1000")) {
+            String deviceName = deviceList.get(position).getName();
+            if (deviceName != null && !deviceName.isEmpty()) {
                 viewHolder.deviceName.setText(deviceName);
             }
-            viewHolder.deviceAddress.setText(deviceList.get(position).getDevice().getAddress());
+            viewHolder.deviceAddress.setText(deviceList.get(position).getMac());
 
         }
         return convertView;

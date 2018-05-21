@@ -7,18 +7,16 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.media.AudioFormat;
 import android.media.AudioManager;
-import android.media.AudioTrack;
-import android.os.Build;
+import android.os.Bundle;
 import android.os.Environment;
 import android.os.IBinder;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -30,13 +28,11 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-
 import com.arialyy.annotations.Download;
 import com.arialyy.aria.core.Aria;
 import com.arialyy.aria.core.download.DownloadTask;
 import com.example.liu.translateheadset.activity.CameraActivity;
 import com.example.liu.translateheadset.adapter.TalkAdapter;
-import com.example.liu.translateheadset.translate.BaiduApi;
 import com.example.liu.translateheadset.gson.Error;
 import com.example.liu.translateheadset.gson.Speak;
 import com.example.liu.translateheadset.gson.TalkAll;
@@ -46,8 +42,9 @@ import com.example.liu.translateheadset.gson.WakeUp;
 import com.example.liu.translateheadset.services.BaiDuSpeekService;
 import com.example.liu.translateheadset.services.BaiDuTTSService;
 import com.example.liu.translateheadset.services.BaiduWakeUpService;
+import com.example.liu.translateheadset.translate.BaiduApi;
 import com.example.liu.translateheadset.translate.GoogleApi;
-import com.example.liu.translateheadset.view.TeachView;
+import com.example.liu.translateheadset.util.MeizuClassicBluetooth;
 import com.example.liu.translateheadset.util.TimeStart2Stop;
 import com.google.gson.Gson;
 
@@ -85,8 +82,7 @@ public class TranslateActivity extends AppCompatActivity {
     private BaiDuSpeekService.SpeekResultListener speekResultListener = new BaiDuSpeekService.SpeekResultListener() {
         @Override
         public void startSpeek(int who) {
-            startTransZh.setClickable(false);
-            startTransEn.setClickable(false);
+            startSpark(true);
             mWho = who;
         }
 
@@ -102,12 +98,10 @@ public class TranslateActivity extends AppCompatActivity {
 
         @Override
         public void successSpeek(String string) {
-            stopSCO();
+            if (MeizuClassicBluetooth.getInstance(TranslateActivity.this).getConnectionBluetooth())
+                stopSCO();
             startTranslate();
-            startTransZh.setClickable(true);
-            startTransZh.setText(R.string.translate_zh);
-            startTransEn.setClickable(true);
-            startTransEn.setText(R.string.translate_en);
+            startSpark(false);
             Speak speak = gson.fromJson(string, Speak.class);
             if (speak.getError() > 0) {
                 Error error = gson.fromJson(string, Error.class);
@@ -169,9 +163,9 @@ public class TranslateActivity extends AppCompatActivity {
         public void SuccessWakeup(String string) {
             WakeUp wakeUp = gson.fromJson(string, WakeUp.class);
             if (wakeUp.getWord().equals("翻译中文")) {
-                startRecording();
+                startRecording("zh");
             } else {
-                speekBinder.start("en");
+                startRecording("en");
             }
         }
     };
@@ -243,6 +237,8 @@ public class TranslateActivity extends AppCompatActivity {
 //        if (Build.VERSION.SDK_INT <= 23){
 //            TeachView.getInstance(this).setImageId(R.drawable.local_translate).initStudyWindow();
 //        }
+
+        saveChannel(getIntent().getBooleanExtra("left", true), getIntent().getBooleanExtra("right", true));
     }
 
     class StartSpeakReceiver extends BroadcastReceiver {
@@ -250,7 +246,7 @@ public class TranslateActivity extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
 //            Log.d(TAG, "onReceive: " + recorder);
-            startRecording();
+            startRecording("zh");
         }
     }
 
@@ -343,6 +339,28 @@ public class TranslateActivity extends AppCompatActivity {
         baiduApi = new BaiduApi(APP_ID, SECURITY_KEY);
         gson = new Gson();
         TimeStart2Stop.timeNeed(this, "initView", last);
+    }
+
+    private void startSpark(boolean start){
+        if (start){
+            startTransZh.setClickable(false);
+            startTransEn.setClickable(false);
+            editText.setText("");
+            wakeUp.stopWakeUp();
+        } else {
+            startTransZh.setClickable(true);
+            startTransZh.setText(R.string.translate_zh);
+            startTransEn.setClickable(true);
+            startTransEn.setText(R.string.translate_en);
+            wakeUp.startWakeUp();
+        }
+    }
+
+    private void saveChannel(Boolean left, Boolean right) {
+        SharedPreferences.Editor editor = this.getSharedPreferences("channel", MODE_PRIVATE).edit();
+        editor.putBoolean("left", left);
+        editor.putBoolean("right", right);
+        editor.commit();
     }
 
     /**
@@ -632,13 +650,14 @@ public class TranslateActivity extends AppCompatActivity {
         startTransZh.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startRecording();
+                    startRecording("zh");
+
             }
         });
         startTransEn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                speekBinder.start("en");
+                startRecording("en");
             }
         });
         send.setOnClickListener(new View.OnClickListener() {
@@ -709,7 +728,11 @@ public class TranslateActivity extends AppCompatActivity {
     /**
      * 打开SCO端口，使用耳机端录音
      */
-    public void startRecording() {
+    public void startRecording(final String language) {
+        if (!MeizuClassicBluetooth.getInstance(TranslateActivity.this).getConnectionBluetooth()){
+            speekBinder.start(language);
+            return;
+        }
         mAudioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
 //        mAudioManager.setMode(AudioManager.MODE_IN_CALL);
         //蓝牙录音的关键，启动SCO连接，耳机话筒才起作用
@@ -732,7 +755,7 @@ public class TranslateActivity extends AppCompatActivity {
                         //  recorder.start();//开始录音
 //                        startSCOListening();
 
-                        speekBinder.start("zh");
+                        speekBinder.start(language);
                     }
 
                     unregisterReceiver(this);  //别遗漏
@@ -758,20 +781,20 @@ public class TranslateActivity extends AppCompatActivity {
      * 切换回A2DP
      * 不切换回来会出现耳机无声音出现。
      */
-    private void setBluetoothA2dpOn(){
-            if (!mAudioManager.isBluetoothA2dpOn())
-                mAudioManager.setBluetoothA2dpOn(true); // 如果A2DP没建立，则建立A2DP连接
-            mAudioManager.stopBluetoothSco();// 如果SCO没有断开，由于SCO优先级高于A2DP，A2DP可能无声音
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    mAudioManager.setStreamSolo(AudioManager.STREAM_MUSIC, true);
-                    // 让声音路由到蓝牙A2DP。此方法虽已弃用，但就它比较直接、好用。
-                    mAudioManager.setRouting(AudioManager.STREAM_MUSIC,
-                            AudioManager.ROUTE_BLUETOOTH_A2DP,
-                            AudioManager.ROUTE_BLUETOOTH);
-                }
-            }).start();
+    private void setBluetoothA2dpOn() {
+        if (!mAudioManager.isBluetoothA2dpOn())
+            mAudioManager.setBluetoothA2dpOn(true); // 如果A2DP没建立，则建立A2DP连接
+        mAudioManager.stopBluetoothSco();// 如果SCO没有断开，由于SCO优先级高于A2DP，A2DP可能无声音
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                mAudioManager.setStreamSolo(AudioManager.STREAM_MUSIC, true);
+                // 让声音路由到蓝牙A2DP。此方法虽已弃用，但就它比较直接、好用。
+                mAudioManager.setRouting(AudioManager.STREAM_MUSIC,
+                        AudioManager.ROUTE_BLUETOOTH_A2DP,
+                        AudioManager.ROUTE_BLUETOOTH);
+            }
+        }).start();
 
     }
 

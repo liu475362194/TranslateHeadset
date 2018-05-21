@@ -10,8 +10,8 @@ android {
         applicationId "com.example.liu.translateheadset"
         minSdkVersion 21
         targetSdkVersion 24
-        versionCode 15
-        versionName "1.5"
+        versionCode 17
+        versionName "1.7"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -30,7 +30,8 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     implementation 'com.squareup.okhttp3:okhttp:3.8.1'
     implementation 'com.google.code.gson:gson:2.8.1'
-    implementation 'com.vise.xiaoyaoyou:baseble:2.0.5'
+//    implementation 'com.vise.xiaoyaoyou:baseble:2.0.6'
+    implementation 'com.clj.fastble:FastBleLib:2.3.0'
     implementation 'com.android.support:recyclerview-v7:26.1.0'
     implementation 'com.kaopiz:kprogresshud:1.0.2'
 //    implementation 'com.jakewharton:butterknife:8.4.0'

@@ -19,16 +19,15 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.clj.fastble.BleManager;
+import com.clj.fastble.data.BleDevice;
+import com.clj.fastble.utils.HexUtil;
 import com.example.liu.translateheadset.DemoApplication;
 import com.example.liu.translateheadset.R;
 import com.example.liu.translateheadset.adapter.DeviceAdapter;
-import com.example.liu.translateheadset.services.BLEService;
+import com.example.liu.translateheadset.services.MeizuBleManager;
 import com.example.liu.translateheadset.util.TimeStart2Stop;
-import com.example.liu.translateheadset.view.TeachView;
 import com.kaopiz.kprogresshud.KProgressHUD;
-import com.vise.baseble.ViseBle;
-import com.vise.baseble.model.BluetoothLeDevice;
-import com.vise.baseble.utils.BleUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,15 +36,14 @@ public class BLEConnect2Activity extends BaseActivity {
 
     private static final String TAG = "BLEConnect2Activity";
 
-    private BLEService.BLEBinder bleBinder;
-
     private KProgressHUD kProgressHUD;
 
     private ListView listView;
     //设备扫描结果展示适配器
     private DeviceAdapter adapter;
     //设备扫描结果集合
-    private volatile List<BluetoothLeDevice> bluetoothLeDeviceList = new ArrayList<>();
+//    private volatile List<BluetoothLeDevice> bluetoothLeDeviceList = new ArrayList<>();
+    private volatile List<BleDevice> bluetoothLeDeviceList = new ArrayList<>();
 
 //    private ServiceConnection connection = new ServiceConnection() {
 //        @Override
@@ -75,7 +73,7 @@ public class BLEConnect2Activity extends BaseActivity {
 
         Log.d(TAG, "onCreate: " + isServiceWork(this, "com.example.liu.translateheadset.services.BLEService"));
         if (!isServiceWork(this, "com.example.liu.translateheadset.services.BLEService")) {
-            bleBinder = DemoApplication.getBleBinder();
+//            bleBinder = DemoApplication.getBleBinder();
             checkBluetoothPermission();
 //            bindService();
         }
@@ -89,12 +87,19 @@ public class BLEConnect2Activity extends BaseActivity {
         adapter = new DeviceAdapter(this);
         listView.setAdapter(adapter);
 
-        Log.e(TAG, "onCreate: " + bleBinder);
+//        Log.e(TAG, "onCreate: " + bleBinder);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                BluetoothLeDevice device = (BluetoothLeDevice) adapter.getItem(i);
-                bleBinder.connectBLE(device.getAddress());
+//                BluetoothLeDevice device = (BluetoothLeDevice) adapter.getItem(i);
+//                bleBinder.connectBLE(device.getAddress());
+                BleDevice device = (BleDevice) adapter.getItem(i);
+                MeizuBleManager.getInstance(BLEConnect2Activity.this).connect(device);
+                kProgressHUD = new KProgressHUD(BLEConnect2Activity.this);
+                kProgressHUD.setStyle(KProgressHUD.Style.SPIN_INDETERMINATE)
+                        .setDetailsLabel("正在连接蓝牙设备...")
+                        .setAnimationSpeed(2)
+                        .show();
             }
         });
 
@@ -103,11 +108,11 @@ public class BLEConnect2Activity extends BaseActivity {
         connectingGattReceiver = new ConnectingGattReceiver();
         connectFailReceiver = new ConnectFailReceiver();
         scanReceiver = new ScanReceiver();
-        registerReceiver("com.example.broadcasttest.CONNECTED", connectedReceiver);
-        registerReceiver("com.example.broadcasttest.CONNECTING", connectingReceiver);
-        registerReceiver("com.example.broadcasttest.CONNECTING_GATT", connectingGattReceiver);
-        registerReceiver("com.example.broadcasttest.DEVICE_FOUND", scanReceiver);
-        registerReceiver("com.example.broadcasttest.CONNECT_FAILURE", connectFailReceiver);
+//        registerReceiver("com.example.broadcasttest.CONNECTED", connectedReceiver);
+//        registerReceiver("com.example.broadcasttest.CONNECTING", connectingReceiver);
+//        registerReceiver("com.example.broadcasttest.CONNECTING_GATT", connectingGattReceiver);
+//        registerReceiver("com.example.broadcasttest.DEVICE_FOUND", scanReceiver);
+//        registerReceiver("com.example.broadcasttest.CONNECT_FAILURE", connectFailReceiver);
 
         if (Build.VERSION.SDK_INT <= 23) {
             runOnUiThread(new Runnable() {
@@ -118,7 +123,31 @@ public class BLEConnect2Activity extends BaseActivity {
             });
         }
 
+
+        MeizuBleManager.getInstance(this).scan(new MeizuBleManager.OnScanListener() {
+            @Override
+            public void scan(BleDevice result) {
+//                bluetoothLeDeviceList = bleBinder.getBluetoothLeDeviceList();
+                bluetoothLeDeviceList.add(result);
+                adapter.setDeviceList(bluetoothLeDeviceList);
+            }
+
+            @Override
+            public void connectionSuccess(BleDevice result) {
+                DemoApplication.getInstance().setBleDevice(result);
+                kProgressHUD.dismiss();
+                finish();
+            }
+
+            @Override
+            public void disconnection() {
+
+            }
+        });
+
     }
+
+
 
     /**
      * 判断某个服务是否正在运行的方法
@@ -159,8 +188,8 @@ public class BLEConnect2Activity extends BaseActivity {
     class ScanReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
-            bluetoothLeDeviceList = bleBinder.getBluetoothLeDeviceList();
-            adapter.setDeviceList(bluetoothLeDeviceList);
+//            bluetoothLeDeviceList = bleBinder.getBluetoothLeDeviceList();
+//            adapter.setDeviceList(bluetoothLeDeviceList);
         }
     }
 
@@ -193,8 +222,9 @@ public class BLEConnect2Activity extends BaseActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             kProgressHUD.dismiss();
-//            getSupportActionBar().setIcon(R.drawable.home_disconnected_pressed);
             finish();
+//            getSupportActionBar().setIcon(R.drawable.home_disconnected_pressed);
+
         }
     }
 
@@ -205,7 +235,7 @@ public class BLEConnect2Activity extends BaseActivity {
 
             Toast.makeText(BLEConnect2Activity.this,"连接失败！请重试",Toast.LENGTH_SHORT).show();
 
-            bleBinder.startScan();
+//            bleBinder.startScan();
 //            ImageView imageView = new ImageView(BLEConnect2Activity.this);
 //            imageView.setBackgroundResource(R.drawable.ease_msg_state_fail_resend);
 //            KProgressHUD.create(BLEConnect2Activity.this)
@@ -236,7 +266,7 @@ public class BLEConnect2Activity extends BaseActivity {
 //            adapter.setDeviceList(bluetoothLeDeviceList);
 //        }
 
-        if (BleUtil.isBleEnable(this)) {
+        if (BleManager.getInstance().isBlueEnable()) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 //校验是否已具有模糊定位权限
                 if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -244,15 +274,15 @@ public class BLEConnect2Activity extends BaseActivity {
                             100);
                 } else {
                     //具有权限
-                    bleBinder.startScan();
+//                    bleBinder.startScan();
                 }
             } else {
 //                Log.e(TAG, "checkBluetoothPermission: " + bleBinder);
                 //系统不高于6.0直接执行
-                bleBinder.startScan();
+//                bleBinder.startScan();
             }
         } else {
-            BleUtil.enableBluetooth(this, 1);
+            BleManager.getInstance().enableBluetooth();
 //            ViseBle.getInstance().getBluetoothAdapter().enable();
 //            bleBinder.startScan();
         }

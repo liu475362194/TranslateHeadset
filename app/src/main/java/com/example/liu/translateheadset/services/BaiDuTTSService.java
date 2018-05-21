@@ -17,6 +17,7 @@ import com.baidu.tts.client.SpeechSynthesizer;
 import com.baidu.tts.client.SpeechSynthesizerListener;
 import com.baidu.tts.client.TtsMode;
 import com.example.liu.translateheadset.listener.MessageListener;
+import com.example.liu.translateheadset.util.MeizuClassicBluetooth;
 
 public class BaiDuTTSService extends Service {
 
@@ -43,9 +44,12 @@ public class BaiDuTTSService extends Service {
     public class GetTts extends Binder {
         //开始朗读
         public void speak(String text) {
-            mSpeechSynthesizer.synthesize(text);
+                mSpeechSynthesizer.synthesize(text);
         }
-        public void mInitTts(Context context){initTts(context);}
+
+        public void mInitTts(Context context) {
+            initTts(context);
+        }
     }
 
     @Override
@@ -53,7 +57,6 @@ public class BaiDuTTSService extends Service {
         // TODO: Return the communication channel to the service.
         return getTtsBinder;
     }
-
 
 
     /**
@@ -69,11 +72,11 @@ public class BaiDuTTSService extends Service {
                     .getApplicationInfo(getPackageName(),
                             PackageManager.GET_META_DATA);
 
-            if (info.metaData.getInt("com.baidu.speech.APP_ID") != 0){
+            if (info.metaData.getInt("com.baidu.speech.APP_ID") != 0) {
                 String appId = String.valueOf(info.metaData.getInt("com.baidu.speech.APP_ID"));
                 String appKey = info.metaData.getString("com.baidu.speech.API_KEY");
                 String appSecret = info.metaData.getString("com.baidu.speech.SECRET_KEY");
-                Log.d(TAG, "initTts:APP_ID " + appId + " , " + appKey + " , "  + appSecret);
+                Log.d(TAG, "initTts:APP_ID " + appId + " , " + appKey + " , " + appSecret);
                 mSpeechSynthesizer.setAppId(appId);
                 mSpeechSynthesizer.setApiKey(appKey, appSecret);
             }

@@ -37,10 +37,10 @@ import com.example.liu.translateheadset.gson.Error;
 import com.example.liu.translateheadset.gson.Message;
 import com.example.liu.translateheadset.gson.Speak;
 import com.example.liu.translateheadset.gson.Valume;
-import com.example.liu.translateheadset.services.BLEService;
 import com.example.liu.translateheadset.services.BaiDuSpeekService;
 import com.example.liu.translateheadset.services.BaiDuTTSService;
 import com.example.liu.translateheadset.util.EaseCommonUtils;
+import com.example.liu.translateheadset.util.MeizuClassicBluetooth;
 import com.example.liu.translateheadset.util.TimeStart2Stop;
 import com.google.gson.Gson;
 import com.hyphenate.EMMessageListener;
@@ -145,7 +145,7 @@ public class ChatActivity extends BaseActivity {
             @Override
             public void onClick(View view) {
 //                speekBinder.start("zh");
-                if (!BLEService.isBleSuccess()) {
+                if (!MeizuClassicBluetooth.getInstance(ChatActivity.this).getConnectionBluetooth()) {
                     speekBinder.start("zh");
                 } else {
                     startRecording();
@@ -171,7 +171,6 @@ public class ChatActivity extends BaseActivity {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            Log.e(TAG, "onReceive: isBleSuccess" + BLEService.isBleSuccess());
             startRecording();
 
         }

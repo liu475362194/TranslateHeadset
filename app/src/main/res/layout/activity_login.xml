@@ -33,65 +33,13 @@
         />
 
 
-    <EditText
-        android:id="@+id/username"
-        android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:layout_margin="20dp"
-        android:background="#fff"
-        android:hint="@string/user_name"
-        android:paddingLeft="10dip"
-        android:singleLine="true"
-        android:textColor="#000"
-        android:textSize="18sp" />
-
-    <EditText
-        android:id="@+id/password"
-        android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:layout_margin="20dp"
-        android:background="#fff"
-        android:hint="@string/password"
-        android:inputType="textPassword"
-        android:paddingLeft="10dip"
-        android:singleLine="true"
-        android:textSize="18sp" />
-
-    <LinearLayout
+    <ViewStub
+        android:id="@+id/view_stub"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="20dp"
-        android:orientation="horizontal" >
+        android:layout="@layout/layout_login"/>
 
-        <Button
-            android:layout_width="0dp"
-            android:layout_height="48dp"
-            android:layout_marginRight="10dip"
-            android:layout_weight="1"
-            android:background="#000"
-            android:gravity="center"
-            android:onClick="register"
-            android:paddingBottom="7dp"
-            android:paddingTop="7dp"
-            android:text="@string/register"
-            android:textColor="#fff"
-            android:textSize="18sp" />
 
-        <Button
-            android:layout_width="0dp"
-            android:layout_height="48dp"
-            android:layout_marginLeft="10dip"
-            android:layout_weight="1"
-            android:background="#000"
-            android:gravity="center"
-            android:onClick="login"
-            android:paddingBottom="7dp"
-            android:paddingTop="7dp"
-            android:text="@string/login"
-            android:textColor="@android:color/white"
-            android:textSize="18sp" />
-
-    </LinearLayout>
 
     <Button
         android:id="@+id/btn_local"
@@ -103,6 +51,19 @@
         android:background="#000"
         android:padding="10dp"
         android:text="本地翻译"
+        android:textColor="#fff"
+        android:textSize="18sp" />
+
+    <Button
+        android:id="@+id/btn_local_oneinoneout"
+        android:layout_width="match_parent"
+        android:layout_height="54dp"
+        android:layout_margin="20dp"
+        android:layout_marginTop="20dp"
+        android:onClick="local1in1out"
+        android:background="#000"
+        android:padding="10dp"
+        android:text="本地翻译(左耳录音右耳翻译)"
         android:textColor="#fff"
         android:textSize="18sp" />
 </LinearLayout>
