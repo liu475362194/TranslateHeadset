@@ -7,7 +7,7 @@
     android:orientation="vertical">
 
 
-    <com.example.liu.translateheadset.view.LayoutTitleBar
+    <com.example.liu.translate.view.LayoutTitleBar
         android:id="@+id/title_bar"
         android:layout_width="match_parent"
         android:layout_height="46dp"
